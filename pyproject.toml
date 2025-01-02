@@ -6,7 +6,7 @@ authors = ["Javicle <supergamer.08.2006@gmail.com>"]
 
 
 packages = [
-    { include = "src/" }
+    { include = "tools_openverse" }
 ]
 
 [tool.poetry.dependencies]
