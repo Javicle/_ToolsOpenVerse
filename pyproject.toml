@@ -3,7 +3,7 @@ name = "tools-openverse"
 version = "0.1.0"
 description = ""
 authors = ["Javicle <supergamer.08.2006@gmail.com>"]
-readme = "README.md"
+
 
 packages = [
     { include = "src/" }
