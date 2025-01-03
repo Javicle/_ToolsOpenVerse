@@ -27,7 +27,7 @@ class Settings(BaseSettings):
     # Redis
     REDIS_HOST: str = os.getenv("REDIS_HOST")
     REDIS_PORT: int = os.getenv("REDIS_PORT")
-    REDIS_DB: int = os.getenv("REDIS_DB")
+    REDIS_DB: Optional[int] = os.getenv("REDIS_DB")
     REDIS_PASSWORD: Optional[str] = os.getenv("REDIS_PASSWORD")
 
     # JWT Settings
@@ -39,7 +39,7 @@ class Settings(BaseSettings):
     SESSION_TTL: int = 3600
 
     model_config = SettingsConfigDict(
-        env_file=".env", env_file_encoding="utf-8", case_sensitive=True
+        env_file=Path(__file__).parent.parent /  ".env", env_file_encoding="utf-8", case_sensitive=True
     )
 
     @property
