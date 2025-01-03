@@ -1,3 +1,4 @@
+import logging
 from functools import lru_cache
 from pathlib import Path
 from typing import Optional
@@ -5,16 +6,15 @@ from typing import Optional
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from redis.asyncio import Redis, from_url
 
-from .logger_ import setup_logger
-
+from tools_openverse.common.logger_ import setup_logger
 import os
+
 
 logger = setup_logger("config")
 
 
-
 class Settings(BaseSettings):
-    PROJECT_NAME: str
+    PROJECT_NAME: str = "UserService"
     DEBUG: bool = False
 
     # Paths
@@ -23,6 +23,8 @@ class Settings(BaseSettings):
     # Database
     DATABASE_DRIVER: str = os.getenv("DATABASE_DRIVER")
     DATABASE_NAME: str = os.getenv("DATABASE_NAME")
+    DATABASE_POOL_SIZE: int = 5
+    DATABASE_MAX_OVERFLOW: int = 10
 
     # Redis
     REDIS_HOST: str = os.getenv("REDIS_HOST")
@@ -39,7 +41,7 @@ class Settings(BaseSettings):
     SESSION_TTL: int = 3600
 
     model_config = SettingsConfigDict(
-        env_file=Path(__file__).parent.parent /  ".env", env_file_encoding="utf-8", case_sensitive=True
+        env_file=Path(__file__).parent.parent / ".env", env_file_encoding="utf-8", case_sensitive=True
     )
 
     @property
@@ -53,20 +55,18 @@ class Settings(BaseSettings):
         auth_part = f":{self.REDIS_PASSWORD}@" if self.REDIS_PASSWORD else ""
         return f"redis://{auth_part}{self.REDIS_HOST}:{self.REDIS_PORT}"
 
+    def log_settings(self, logger_: logging.Logger) -> None:
+        settings_dict = self.model_dump(exclude={"JWT_SECRET_KEY", "REDIS_PASSWORD"})
+        logger_.info(f"Settings: {settings_dict}")
+        for key, value in settings_dict.items():
+            logger_.info(f"{key}: {value}")
+
 
 @lru_cache
 def get_settings() -> Settings:
 
     settings = Settings()
-
-    logger.info("Starting application with the following settings:")
-    logger.info(f"PROJECT_NAME: {settings.PROJECT_NAME}")
-    logger.info(f"DEBUG: {settings.DEBUG}")
-    logger.info(f"DATABASE_URL: {settings.database_url}")
-    logger.info(f"REDIS_URL: {settings.redis_url}")
-    logger.info(f"ACCESS_TOKEN_EXPIRE_MINUTES: {settings.ACCESS_TOKEN_EXPIRE_MINUTES}")
-    logger.info(f"SESSION_TTL: {settings.SESSION_TTL}")
-
+    settings.log_settings(logger)
     return settings
 
 
@@ -84,4 +84,3 @@ async def get_redis() -> Redis:
 
 # Экспортируем settings для использования в других модулях
 settings = get_settings()
-
