@@ -1,4 +1,4 @@
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
 setup(
     name="Tools",
@@ -9,10 +9,10 @@ setup(
     packages=find_packages(where="src"),
     package_dir={"": "src"},
     install_requires=[
-        "fastapi" ,
-        "redis" ,
-        "pydantic" ,
-        "pydantic-settings" ,
-        "setuptools" ,
-    ]
+        "fastapi",
+        "redis",
+        "pydantic",
+        "pydantic-settings",
+        "setuptools",
+    ],
 )

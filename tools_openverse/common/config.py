@@ -1,21 +1,21 @@
 import logging
+import os
 from functools import lru_cache
 from pathlib import Path
 from typing import Optional
 
+from dotenv import find_dotenv
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from redis.asyncio import Redis, from_url
 
 from tools_openverse.common.logger_ import setup_logger
-import os
-
 
 logger = setup_logger("config")
 
 
 class Settings(BaseSettings):
-    PROJECT_NAME: str = "UserService"
-    DEBUG: bool = False
+    PROJECT_NAME: str = os.getenv("PROJECT_NAME")
+    DEBUG: bool = os.getenv("DEBUG")
 
     # Paths
     BASE_DIR: Path = Path(__file__).parent.parent
@@ -41,7 +41,9 @@ class Settings(BaseSettings):
     SESSION_TTL: int = 3600
 
     model_config = SettingsConfigDict(
-        env_file=Path(__file__).parent.parent / ".env", env_file_encoding="utf-8", case_sensitive=True
+        env_file=find_dotenv(filename=".env", raise_error_if_not_found=True),
+        env_file_encoding="utf-8",
+        case_sensitive=True,
     )
 
     @property
