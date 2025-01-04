@@ -1,9 +1,22 @@
 from fastapi import HTTPException
 
 
+class BaseHTTPException(HTTPException):
+    def __init__(
+        self, status_code: int, detail: str | None = None, headers: dict[str, str] | None = None
+    ):
+        super().__init__(
+            status_code=status_code,
+            detail=detail if detail else f"Возникла ошибка :{self.__class__.__name__}",
+            headers=headers if headers else None,
+        )
+
+
 class BaseHTTPValidationError(HTTPException):
     def __init__(self, validation_field: str, message: str | None = None):
-        super().__init__(status_code=400, detail=message if message else "Ошибка валидации")
+        super().__init__(
+            status_code=400, detail=message if message else f"Ошибка валидации в {validation_field}"
+        )
         self.validation_field = validation_field
 
 
