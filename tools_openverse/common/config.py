@@ -30,7 +30,7 @@ class Settings(BaseSettings):
     REDIS_HOST: str = os.getenv("REDIS_HOST")  # type: ignore
     REDIS_PORT: int = os.getenv("REDIS_PORT")  # type: ignore
     REDIS_DB: Optional[int] = os.getenv("REDIS_DB")  # type: ignore
-    REDIS_PASSWORD: Optional[str] = os.getenv("REDIS_PASSWORD")  # type: ignore
+    REDIS_PASSWORD: Optional[str] = os.getenv("REDIS_PASSWORD")
 
     # JWT Settings
     JWT_ALGORITHM: str = os.getenv("JWT_ALGORITHM")  # type: ignore

@@ -22,7 +22,7 @@ packages = [
 python = "^3.12"
 fastapi = "^0.115.6"
 redis = "^5.2.1"
-pydantic = "^2.10.4"
+pydantic = {extras = ["email"], version = "^2.10.4"}
 pydantic-settings = "^2.7.0"
 setuptools = "^75.6.0"
 python-dotenv = "^1.0.1"
