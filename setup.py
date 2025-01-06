@@ -9,6 +9,7 @@ setup(
     packages=find_packages(where="src"),
     package_data={"tools_openverse.common": ["py.typed"]},
     package_dir={"": "src"},
+    include_package_data=True,
     install_requires=[
         "fastapi",
         "redis",
