@@ -3,8 +3,16 @@ from uuid import UUID
 from .schemas import AbstractValidation
 from pydantic import EmailStr
 
-UserId = Union[UUID, AbstractValidation]
-UserLogin = Union[str, AbstractValidation]
-UserName = Union[str, AbstractValidation]
-UserPassword = Union[str, AbstractValidation]
-UserEmail = Union[EmailStr, str, AbstractValidation]
+
+BaseUserID = UUID
+BaseUserLogin = str
+BaseUserName = str
+BaseUserPassword = str
+BaseUserEmail = EmailStr
+
+
+UserId = Union[BaseUserID, AbstractValidation[BaseUserID]]
+UserLogin = Union[BaseUserLogin, AbstractValidation[BaseUserLogin]]
+UserName = Union[BaseUserName, AbstractValidation[BaseUserName]]
+UserPassword = Union[BaseUserPassword, AbstractValidation[BaseUserPassword]]
+UserEmail = Union[EmailStr, BaseUserEmail, AbstractValidation[BaseUserEmail]]
