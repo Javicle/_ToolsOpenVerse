@@ -7,6 +7,7 @@ setup(
     author="Javicle",
     author_email="qubackx@gmail.com",
     packages=find_packages(where="src"),
+    package_data={"tools_openverse.common": ["py.typed"]},
     package_dir={"": "src"},
     install_requires=[
         "fastapi",

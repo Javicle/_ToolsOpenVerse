@@ -14,7 +14,7 @@ class AbstractValidation(ABC, BaseModel, Generic[T]):
     # @field_validator("value")
     @classmethod
     @abstractmethod
-    def validate(cls, value: T) -> T:
+    def validate(cls, value: T) -> "AbstractValidation[T]":
         pass
 
     def __str__(self) -> str:
