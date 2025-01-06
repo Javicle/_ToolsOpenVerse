@@ -1,9 +1,9 @@
-from typing import Union
+from typing import TypeVar, Union
 from uuid import UUID
-from .schemas import AbstractValidation
+
 from pydantic import EmailStr
 
-from typing_extensions import Protocol, TypeVar
+from tools_openverse.common.abc.validation import AbstractValidation
 
 T = TypeVar("T")
 
@@ -12,7 +12,6 @@ BaseUserLogin = str
 BaseUserName = str
 BaseUserPassword = str
 BaseUserEmail = EmailStr
-
 
 UserId = Union[BaseUserID, AbstractValidation[BaseUserID]]
 UserLogin = Union[BaseUserLogin, AbstractValidation[BaseUserLogin]]
