@@ -2,9 +2,9 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import Generic, TypeVar
 
-from .types import UserEmail, UserID, UserLogin, UserName, UserPassword
+from .types import UserEmail, UserId, UserLogin, UserName, UserPassword
 
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, Field
 
 
 T = TypeVar("T")
@@ -18,7 +18,7 @@ class ValidationRules:
 class AbstractUser(ABC, BaseModel):
     """Abstract user class"""
 
-    id: UserID
+    id: UserId
     login: UserLogin
     name: UserName
     password: UserPassword
