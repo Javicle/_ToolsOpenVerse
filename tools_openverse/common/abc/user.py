@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import Generic, TypeVar
 
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr
 
 from tools_openverse.common.types import EmailT, IdT, LoginT, NameT, PasswordT
 
@@ -23,7 +23,7 @@ class AbstractUser(ABC, BaseModel, Generic[IdT, LoginT, NameT, PasswordT, EmailT
     email: EmailT | EmailStr
     is_active: bool
     created_at: datetime
-    updated_at: datetime | None = Field(default=None)
+    updated_at: datetime
 
     class Config:
         arbitrary_types_allowed = True
