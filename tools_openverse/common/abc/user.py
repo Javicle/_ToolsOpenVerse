@@ -1,8 +1,11 @@
 from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import TypeVar
+from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, EmailStr, Field
+
+from tools_openverse.common.abc.validation import AbstractValidation
 
 from ..types import UserEmail, UserId, UserLogin, UserName, UserPassword
 
@@ -16,11 +19,11 @@ class ValidationRules:
 class AbstractUser(ABC, BaseModel):
     """Abstract user class"""
 
-    id: UserId
-    login: UserLogin
-    name: UserName
-    password: UserPassword
-    email: UserEmail
+    id: UUID | AbstractValidation[UUID]
+    login: str | AbstractValidation[str]
+    name: str | AbstractValidation[str]
+    password: str | AbstractValidation[str]
+    email: EmailStr | str | AbstractValidation[str]
     is_active: bool
     created_at: datetime
     updated_at: datetime | None = Field(default=None)
