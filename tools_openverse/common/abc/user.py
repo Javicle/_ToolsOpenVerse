@@ -25,6 +25,9 @@ class AbstractUser(ABC, BaseModel):
     created_at: datetime
     updated_at: datetime | None = Field(default=None)
 
+    class Config:
+        arbitrary_types_allowed = True
+
     @abstractmethod
     def change_password(self, new_password: str) -> None:
         pass

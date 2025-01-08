@@ -6,7 +6,8 @@ from typing import Optional
 
 from dotenv import find_dotenv
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from redis.asyncio import Redis, from_url
+from redis.asyncio import from_url  # type: ignore[PylancereportUnknownVariableType]
+from redis.asyncio import Redis  # type: ignore[PylancereportUnknownVariableType]
 
 from tools_openverse.common.logger_ import setup_logger
 
@@ -79,9 +80,7 @@ async def get_redis() -> Redis:
     """
     settings_config = get_settings()
 
-    return await from_url(  # type: ignore
-        settings_config.redis_url, decode_responses=True, encoding="utf-8"
-    )
+    return await from_url(settings_config.redis_url, decode_responses=True, encoding="utf-8")
 
 
 # Экспортируем settings для использования в других модулях

@@ -4,7 +4,6 @@ from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
 
-# Implement the setup_logger function to initialize the logger and set up the necessary handlers
 def setup_logger(name: str = __name__) -> logging.Logger:
     log_dir = Path("logs")
     log_dir.mkdir(exist_ok=True)

@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
-from typing import Generic, TypeVar
+from typing import Any, Generic, TypeVar
 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 T = TypeVar("T")
 
@@ -11,11 +11,8 @@ class AbstractValidation(ABC, BaseModel, Generic[T]):
 
     value: T
 
-    # @field_validator("value")
+    @field_validator("value")
     @classmethod
     @abstractmethod
-    def validate(cls, value: T) -> "AbstractValidation[T]":
+    def validate(cls, value: T) -> Any:
         pass
-
-    def __str__(self) -> str:
-        return f"{self.__class__.__name__}({self.value})"
