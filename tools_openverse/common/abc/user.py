@@ -7,8 +7,6 @@ from pydantic import BaseModel, EmailStr, Field
 
 from tools_openverse.common.abc.validation import AbstractValidation
 
-from ..types import UserEmail, UserId, UserLogin, UserName, UserPassword
-
 T = TypeVar("T")
 
 
