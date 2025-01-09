@@ -9,10 +9,6 @@ from tools_openverse.common.types import EmailT, IdT, LoginT, NameT, PasswordT
 T = TypeVar("T")
 
 
-class ValidationRules:
-    pass
-
-
 class AbstractUser(ABC, BaseModel, Generic[IdT, LoginT, NameT, PasswordT, EmailT]):
     """Abstract user class"""
 
@@ -27,6 +23,7 @@ class AbstractUser(ABC, BaseModel, Generic[IdT, LoginT, NameT, PasswordT, EmailT
 
     class Config:
         arbitrary_types_allowed = True
+        from_attributes = True
 
     @abstractmethod
     def change_password(self, new_password: str) -> None:
