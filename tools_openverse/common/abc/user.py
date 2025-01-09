@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from datetime import datetime
 
 from pydantic import BaseModel
 
@@ -14,9 +13,9 @@ class AbstractUser(ABC, BaseModel):
     name: UserTypes.name
     password: UserTypes.password
     email: UserTypes.email
-    is_active: bool
-    created_at: datetime
-    updated_at: datetime
+    is_active: UserTypes.is_active
+    created_at: UserTypes.created_at
+    updated_at: UserTypes.updated_at
 
     class Config:
         arbitrary_types_allowed = True
