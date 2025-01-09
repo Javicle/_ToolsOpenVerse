@@ -1,22 +1,19 @@
 from abc import ABC, abstractmethod
 from datetime import datetime
-from typing import Generic, TypeVar
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel
 
-from tools_openverse.common.types import EmailT, IdT, LoginT, NameT, PasswordT
-
-T = TypeVar("T")
+from tools_openverse.common.types import UserTypes
 
 
-class AbstractUser(ABC, BaseModel, Generic[IdT, LoginT, NameT, PasswordT, EmailT]):
+class AbstractUser(ABC, BaseModel):
     """Abstract user class"""
 
-    id: IdT
-    login: LoginT
-    name: NameT
-    password: PasswordT
-    email: EmailT | EmailStr
+    id: UserTypes.id
+    login: UserTypes.login
+    name: UserTypes.name
+    password: UserTypes.password
+    email: UserTypes.email
     is_active: bool
     created_at: datetime
     updated_at: datetime
