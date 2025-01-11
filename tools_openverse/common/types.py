@@ -18,6 +18,7 @@ TokenType: TypeAlias = Optional[Literal["Bearer"]]
 Sub: TypeAlias = Union[Name, UUID]
 Scopes: TypeAlias = Optional[list[str]]
 Expires: TypeAlias = timedelta
+Expires_at: TypeAlias = datetime
 JwtAlgoritm: TypeAlias = str
 JwtSecretKey: TypeAlias = str
 
