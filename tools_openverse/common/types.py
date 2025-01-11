@@ -13,7 +13,7 @@ Is_active: TypeAlias = bool
 Created_at: TypeAlias = datetime
 Updated_at: TypeAlias = datetime
 AccessToken: TypeAlias = str
-RefreshToken: TypeAlias = Optional[str]
+RefreshTokenStr: TypeAlias = Optional[str]
 TokenType: TypeAlias = Optional[Literal["Bearer"]]
 Sub: TypeAlias = Union[Name, UUID]
 Scopes: TypeAlias = Optional[list[str]]
@@ -36,7 +36,7 @@ class UserTypes:
 
 class JwtTokenTypes:
     access_token = AccessToken
-    refresh_token = RefreshToken
+    refresh_token = RefreshTokenStr
     token_type = TokenType
 
 
@@ -50,3 +50,9 @@ class DecodedTokenTypes:
     token = AccessToken
     jwt_algoritm = JwtAlgoritm
     jwt_secret_key = JwtSecretKey
+
+
+class RefreshTokenTypes:
+    user_id: Id
+    refresh_token: RefreshTokenStr
+    expires_at: Expires_at
