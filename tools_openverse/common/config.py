@@ -2,41 +2,54 @@ import logging
 import os
 from functools import lru_cache
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 from dotenv import find_dotenv
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from redis.asyncio import from_url  # type: ignore[PylancereportUnknownVariableType]
 from redis.asyncio import Redis  # type: ignore[PylancereportUnknownVariableType]
+from redis.asyncio import from_url  # type: ignore[PylancereportUnknownVariableType]
 
 from tools_openverse.common.logger_ import setup_logger
 
 logger = setup_logger("config")
 
 
+def get_env_value(key: str) -> Any:
+    """Получаем значение переменной окружения"""
+    result = os.getenv(key)
+    if not result:
+        raise ValueError(f"Environment variable '{key}' not found")
+    return result
+
+
 class Settings(BaseSettings):
-    PROJECT_NAME: str = os.getenv("PROJECT_NAME")  # type: ignore
-    DEBUG: bool = os.getenv("DEBUG")  # type: ignore
+    PROJECT_NAME: str = get_env_value("PROJECT_NAME")
+    DEBUG: bool = get_env_value("DEBUG")
 
     # Paths
     BASE_DIR: Path = Path(__file__).parent.parent
 
     # Database
-    DATABASE_DRIVER: str = os.getenv("DATABASE_DRIVER")  # type: ignore
-    DATABASE_NAME: str = os.getenv("DATABASE_NAME")  # type: ignore
+    DATABASE_DRIVER: str = get_env_value("DATABASE_DRIVER")
+    DATABASE_NAME: str = get_env_value("DATABASE_NAME")
     DATABASE_POOL_SIZE: int = 5
     DATABASE_MAX_OVERFLOW: int = 10
 
     # Redis
-    REDIS_HOST: str = os.getenv("REDIS_HOST")  # type: ignore
-    REDIS_PORT: int = os.getenv("REDIS_PORT")  # type: ignore
-    REDIS_DB: Optional[int] = os.getenv("REDIS_DB")  # type: ignore
-    REDIS_PASSWORD: Optional[str] = os.getenv("REDIS_PASSWORD")
+    REDIS_HOST: str = get_env_value("REDIS_HOST")
+    REDIS_PORT: int = get_env_value("REDIS_PORT")
+    REDIS_DB: Optional[int] = get_env_value("REDIS_DB")
+    REDIS_PASSWORD: Optional[str] = get_env_value("REDIS_PASSWORD")
 
     # JWT Settings
-    JWT_ALGORITHM: str = os.getenv("JWT_ALGORITHM")  # type: ignore
-    JWT_SECRET_KEY: str = os.getenv("JWT_SECRET_KEY")  # type: ignore
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    JWT_ALGORITHM: str = get_env_value("JWT_ALGORITHM")
+    JWT_SECRET_KEY: str = get_env_value("JWT_SECRET_KEY")
+
+    ALL_SERVICES: list[str] = ["USERS, AUTHETICATION, TEST"]
+    OTHER_SERVICES: str = get_env_value("OTHER_SERVICES")
+    BASE_URL: str = get_env_value("BASE_URL")
+    PORT_SERVICE: str | int = get_env_value("PORT_SERVICE")
 
     # Session
     SESSION_TTL: int = 3600
@@ -63,6 +76,20 @@ class Settings(BaseSettings):
         logger_.info(f"Settings: {settings_dict}")
         for key, value in settings_dict.items():
             logger_.info(f"{key}: {value}")
+
+    @field_validator("PROJECT_NAME")
+    @classmethod
+    def validate_project_name(cls, value: str) -> str:
+        # Получаем OTHER_SERVICES из переменных окружения напрямую
+        other_services = os.getenv("OTHER_SERVICES", "").split()
+
+        if not other_services:
+            raise ValueError("OTHER_SERVICES environment variable is empty or not set")
+
+        if value in other_services:
+            raise ValueError(f"PROJECT_NAME '{value}' must be one of: {', '.join(other_services)}")
+
+        return value
 
 
 @lru_cache
