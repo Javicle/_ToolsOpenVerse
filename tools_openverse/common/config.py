@@ -31,10 +31,18 @@ class Settings(BaseSettings):
     BASE_DIR: Path = Path(__file__).parent.parent
 
     # Database
-    DATABASE_DRIVER: str = get_env_value("DATABASE_DRIVER")
+    ALLOWED_DATABASES: list[str] = ["sqlite3", "postgresql"]
+
+    # Database
     DATABASE_NAME: str = get_env_value("DATABASE_NAME")
+    DATABASE_DRIVER: str = get_env_value("DATABASE_DRIVER")
     DATABASE_POOL_SIZE: int = 5
     DATABASE_MAX_OVERFLOW: int = 10
+    DATABASE_HOST: Optional[str] = get_env_value("DATABASE_HOST")
+    DATABASE_PORT: Optional[str] = get_env_value("DATABASE_PORT")
+    DATABASE_USER: Optional[str] = get_env_value("DATABASE_USER")
+    DATABASE_PASSWORD: Optional[str] = get_env_value("DATABASE_PASSWORD")
+    DATABASE_FILE_NAME: str = get_env_value("DATABASE_FILE_NAME")
 
     # Redis
     REDIS_HOST: str = get_env_value("REDIS_HOST")
@@ -63,7 +71,16 @@ class Settings(BaseSettings):
     @property
     def database_url(self) -> str:
         """Формируем URL для подключения к базе данных"""
-        return f"{self.DATABASE_DRIVER}:///{self.BASE_DIR / self.DATABASE_NAME}"
+        if self.DATABASE_NAME == "sqlite3":
+            return f"{self.DATABASE_DRIVER}:///{self.BASE_DIR / self.DATABASE_FILE_NAME}"
+        elif self.DATABASE_NAME == "postgresql":
+            return (
+                f"{self.DATABASE_DRIVER}://"
+                f"{self.DATABASE_USER}:{self.DATABASE_PASSWORD}"
+                f"@{self.DATABASE_HOST}:{self.DATABASE_PORT}"
+                f"/{self.DATABASE_NAME}"
+            )
+        raise ValueError(f"Unsupported database: {self.DATABASE_NAME}")
 
     @property
     def redis_url(self) -> str:
@@ -80,7 +97,6 @@ class Settings(BaseSettings):
     @field_validator("PROJECT_NAME")
     @classmethod
     def validate_project_name(cls, value: str) -> str:
-        # Получаем OTHER_SERVICES из переменных окружения напрямую
         other_services = os.getenv("OTHER_SERVICES", "").split()
 
         if not other_services:
@@ -88,6 +104,26 @@ class Settings(BaseSettings):
 
         if value in other_services:
             raise ValueError(f"PROJECT_NAME '{value}' must be one of: {', '.join(other_services)}")
+
+        return value
+
+    @field_validator("DATABASE_NAME")
+    @classmethod
+    def validate_database_name(cls, value: str) -> str:
+        value = value.lower()
+        if value not in cls.ALLOWED_DATABASES:
+            raise ValueError(f"Database {value}must be one of {cls.ALLOWED_DATABASES}")
+
+        if value == "postgresql":
+            required_vars = ["DATABASE_HOST", "DATABASE_PORT", "DATABASE_USER", "DATABASE_PASSWORD"]
+            missing_vars = [var for var in required_vars if not os.getenv(var)]
+            if missing_vars:
+                raise ValueError(
+                    f"Missing required environment variables for PostgreSQL: {', '.join(missing_vars)}"
+                )
+        elif value == "sqlite3":
+            if not os.getenv("DATABASE_FILE_NAME"):
+                raise ValueError("Missing DATABASE_FILE_NAME for SQLite")
 
         return value
 

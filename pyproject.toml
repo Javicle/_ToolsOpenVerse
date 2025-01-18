@@ -32,6 +32,8 @@ mypy = "^1.14.1"
 black = "^24.10.0"
 pylint = "^3.3.3"
 httpx = "^0.28.1"
+rich = "^13.9.4"
+sqlalchemy = "^2.0.37"
 
 [build-system]
 requires = ["poetry-core"]

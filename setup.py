@@ -16,5 +16,7 @@ setup(
         "pydantic",
         "pydantic-settings",
         "setuptools",
+        "rich",
+        "sqlalchemy",
     ],
 )
