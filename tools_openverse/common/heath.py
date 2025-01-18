@@ -82,7 +82,7 @@ class HealthCheck:
         return results
 
     async def display_start_message(self) -> None:
-        """Красивая таблица"""
+        """Красивая таблица с информацией о сервисах."""
         table = Table(title="Service Heath Status")
 
         table.add_column("Service", style="cyan")
