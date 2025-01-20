@@ -1,8 +1,8 @@
 import logging
 import os
-from functools import lru_cache
+from functools import cache
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any, ClassVar, Optional
 
 from dotenv import find_dotenv
 from pydantic import field_validator
@@ -17,9 +17,11 @@ logger = setup_logger("config")
 
 def get_env_value(key: str) -> Any:
     """Получаем значение переменной окружения"""
+
+    logger.debug(f"Get environment variable '{key}'")
     result = os.getenv(key)
     if not result:
-        raise ValueError(f"Environment variable '{key}' not found")
+        return None
     return result
 
 
@@ -28,13 +30,13 @@ class Settings(BaseSettings):
     DEBUG: bool = get_env_value("DEBUG")
 
     # Paths
-    BASE_DIR: Path = Path(__file__).parent.parent
+    BASE_DIR: Path = Path(__file__).parent.parent.parent.parent.parent.parent
 
     # Database
-    ALLOWED_DATABASES: list[str] = ["sqlite3", "postgresql"]
+    ALLOWED_DATABASES: ClassVar[list[str]] = ["sqlite3", "postgresql"]
 
     # Database
-    DATABASE_NAME: str = get_env_value("DATABASE_NAME")
+    DATABASE_DB: str = get_env_value("DATABASE_NAME")
     DATABASE_DRIVER: str = get_env_value("DATABASE_DRIVER")
     DATABASE_POOL_SIZE: int = 5
     DATABASE_MAX_OVERFLOW: int = 10
@@ -42,7 +44,8 @@ class Settings(BaseSettings):
     DATABASE_PORT: Optional[str] = get_env_value("DATABASE_PORT")
     DATABASE_USER: Optional[str] = get_env_value("DATABASE_USER")
     DATABASE_PASSWORD: Optional[str] = get_env_value("DATABASE_PASSWORD")
-    DATABASE_FILE_NAME: str = get_env_value("DATABASE_FILE_NAME")
+    DATABASE_FILE_NAME: Optional[str] = get_env_value("DATABASE_FILE_NAME")
+    DATABASE_NAME: Optional[str] = get_env_value("DATABASE_NAME")
 
     # Redis
     REDIS_HOST: str = get_env_value("REDIS_HOST")
@@ -54,7 +57,7 @@ class Settings(BaseSettings):
     JWT_ALGORITHM: str = get_env_value("JWT_ALGORITHM")
     JWT_SECRET_KEY: str = get_env_value("JWT_SECRET_KEY")
 
-    ALL_SERVICES: list[str] = ["USERS, AUTHETICATION, TEST"]
+    ALL_SERVICES: ClassVar[list[str]] = ["USERS, AUTHETICATION, TEST"]
     OTHER_SERVICES: str = get_env_value("OTHER_SERVICES")
     BASE_URL: str = get_env_value("BASE_URL")
     PORT_SERVICE: str | int = get_env_value("PORT_SERVICE")
@@ -69,18 +72,25 @@ class Settings(BaseSettings):
     )
 
     @property
-    def database_url(self) -> str:
+    def database_url(self) -> Optional[str]:
         """Формируем URL для подключения к базе данных"""
-        if self.DATABASE_NAME == "sqlite3":
-            return f"{self.DATABASE_DRIVER}:///{self.BASE_DIR / self.DATABASE_FILE_NAME}"
-        elif self.DATABASE_NAME == "postgresql":
+        if self.DATABASE_DB == "sqlite3":
             return (
+                f"{self.DATABASE_DRIVER}:///{self.BASE_DIR / self.DATABASE_FILE_NAME}"
+                if self.DATABASE_FILE_NAME
+                else None
+            )
+        elif self.DATABASE_DB == "postgresql":
+            url = (
                 f"{self.DATABASE_DRIVER}://"
                 f"{self.DATABASE_USER}:{self.DATABASE_PASSWORD}"
                 f"@{self.DATABASE_HOST}:{self.DATABASE_PORT}"
                 f"/{self.DATABASE_NAME}"
             )
-        raise ValueError(f"Unsupported database: {self.DATABASE_NAME}")
+
+            logger.debug(f"Formed url {url}")
+            return url
+        raise ValueError(f"Unsupported database: {self.DATABASE_DB}")
 
     @property
     def redis_url(self) -> str:
@@ -97,7 +107,7 @@ class Settings(BaseSettings):
     @field_validator("PROJECT_NAME")
     @classmethod
     def validate_project_name(cls, value: str) -> str:
-        other_services = os.getenv("OTHER_SERVICES", "").split()
+        other_services = os.getenv("OTHER_SERVICES", "").split(", ")
 
         if not other_services:
             raise ValueError("OTHER_SERVICES environment variable is empty or not set")
@@ -107,12 +117,12 @@ class Settings(BaseSettings):
 
         return value
 
-    @field_validator("DATABASE_NAME")
+    @field_validator("DATABASE_DB")
     @classmethod
     def validate_database_name(cls, value: str) -> str:
         value = value.lower()
-        if value not in cls.ALLOWED_DATABASES:
-            raise ValueError(f"Database {value}must be one of {cls.ALLOWED_DATABASES}")
+        if value not in Settings.ALLOWED_DATABASES:
+            raise ValueError(f"Database {value}must be one of {Settings.ALLOWED_DATABASES}")
 
         if value == "postgresql":
             required_vars = ["DATABASE_HOST", "DATABASE_PORT", "DATABASE_USER", "DATABASE_PASSWORD"]
@@ -128,7 +138,7 @@ class Settings(BaseSettings):
         return value
 
 
-@lru_cache
+@cache
 def get_settings() -> Settings:
 
     settings = Settings()
@@ -136,15 +146,14 @@ def get_settings() -> Settings:
     return settings
 
 
+# Экспортируем settings для использования в других модулях
+settings = get_settings()
+
+
 # Создаем асинхронное подключение к Redis
 async def get_redis() -> Redis:
     """
     Создаем подключение к Redis с настройками из конфигурации
     """
-    settings_config = get_settings()
 
-    return await from_url(settings_config.redis_url, decode_responses=True, encoding="utf-8")
-
-
-# Экспортируем settings для использования в других модулях
-settings = get_settings()
+    return await from_url(settings.redis_url, decode_responses=True, encoding="utf-8")
