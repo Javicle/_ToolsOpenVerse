@@ -8,6 +8,24 @@ from pydantic import BaseModel
 from .config import settings
 
 
+class UsersRoutes(str, Enum):
+    CREATE_USER = "/users/create"
+    GET_USER_BY_ID = "/users/{id}"
+    GET_USER_BY_LOGIN = "/users/login/{user_login}"
+    UPDATE_USER = "/users/update"
+    DELETE_USER_BY_ID = "/users/delete/{user_id}"
+    DELETE_USER_BY_LOGIN = "/users/delete/login/{user_login}"
+    HEALTH = "/health"
+
+
+class AuthenticationRoutes(str, Enum): ...
+
+
+class RoutesNamespace:
+    USERS = UsersRoutes
+    AUTHENTICATION = AuthenticationRoutes
+
+
 class ServiceName(str, Enum):
     USERS = "USERS"
     AUTHENTICATION = "AUTHENTICATION"
@@ -77,7 +95,6 @@ class SetRequest:
                     message=f"Missing URL parameter: {e}", status_code=status.HTTP_400_BAD_REQUEST
                 )
 
-        # Собираем финальный URL
         if settings.PORT_SERVICE:
             return f"{base_url}:{settings.PORT_SERVICE}/{route}"
         return f"{base_url}/{route}"
