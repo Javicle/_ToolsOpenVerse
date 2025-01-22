@@ -4,6 +4,7 @@ from tools_openverse.common.request import (
     BaseRequestException,
     CreateUserRequest,
     HttpMethods,
+    RoutesNamespace,
     ServiceName,
     SetRequest,
 )
@@ -17,10 +18,12 @@ async def main():
         login="test", name="gkdfohjf", password="test123", email="test@test.com"
     )
 
+    print(ServiceName.USERS, RoutesNamespace.USERS.CREATE_USER.value)
+
     try:
         result = await request_client.send_request(
             service_name=ServiceName.USERS,
-            route_name="create_user",
+            route_name=RoutesNamespace.USERS.CREATE_USER,
             route_method=HttpMethods.POST,
             data=test_data,
         )

@@ -56,3 +56,19 @@ class RefreshTokenTypes:
     user_id: Id
     refresh_token: RefreshTokenStr
     expires_at: Expires_at
+
+
+# Type definitions
+UsersRoutesTypes = Literal[
+    "CREATE_USER",
+    "GET_USER_BY_ID",
+    "GET_USER_BY_LOGIN",
+    "UPDATE_USER",
+    "DELETE_USER_BY_ID",
+    "DELETE_USER_BY_LOGIN",
+    "HEALTH",
+]
+
+AuthenticationRoutesTypes = Literal["GET_ACCESS_TOKEN", "GET_REFRESH_TOKEN", "GET_USER_INFO"]
+
+RoutesNamespaceTypes = Union[UsersRoutesTypes, AuthenticationRoutesTypes]
