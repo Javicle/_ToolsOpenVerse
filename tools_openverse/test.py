@@ -15,7 +15,7 @@ async def main():
 
     # Создание пользователя
     test_data = CreateUserRequest(
-        login="test", name="gkdfohjf", password="test123", email="test@test.com"
+        login="testgted", name="", password="test123", email="test@test.com"
     )
 
     print(ServiceName.USERS, RoutesNamespace.USERS.CREATE_USER.value)

@@ -680,3 +680,126 @@
 2025-01-22 22:15:48,123 - config - INFO - BASE_URL: localhost
 2025-01-22 22:15:48,123 - config - INFO - PORT_SERVICE: 8000
 2025-01-22 22:15:48,123 - config - INFO - SESSION_TTL: 3600
+2025-01-23 09:45:33,592 - config - DEBUG - Get environment variable 'PROJECT_NAME'
+2025-01-23 09:45:33,592 - config - DEBUG - Get environment variable 'DEBUG'
+2025-01-23 09:45:33,593 - config - DEBUG - Get environment variable 'DATABASE_NAME'
+2025-01-23 09:45:33,593 - config - DEBUG - Get environment variable 'DATABASE_DRIVER'
+2025-01-23 09:45:33,593 - config - DEBUG - Get environment variable 'DATABASE_HOST'
+2025-01-23 09:45:33,593 - config - DEBUG - Get environment variable 'DATABASE_PORT'
+2025-01-23 09:45:33,593 - config - DEBUG - Get environment variable 'DATABASE_USER'
+2025-01-23 09:45:33,593 - config - DEBUG - Get environment variable 'DATABASE_PASSWORD'
+2025-01-23 09:45:33,593 - config - DEBUG - Get environment variable 'DATABASE_FILE_NAME'
+2025-01-23 09:45:33,593 - config - DEBUG - Get environment variable 'DATABASE_NAME'
+2025-01-23 09:45:33,593 - config - DEBUG - Get environment variable 'REDIS_HOST'
+2025-01-23 09:45:33,593 - config - DEBUG - Get environment variable 'REDIS_PORT'
+2025-01-23 09:45:33,593 - config - DEBUG - Get environment variable 'REDIS_DB'
+2025-01-23 09:45:33,593 - config - DEBUG - Get environment variable 'REDIS_PASSWORD'
+2025-01-23 09:45:33,593 - config - DEBUG - Get environment variable 'JWT_ALGORITHM'
+2025-01-23 09:45:33,593 - config - DEBUG - Get environment variable 'JWT_SECRET_KEY'
+2025-01-23 09:45:33,593 - config - DEBUG - Get environment variable 'OTHER_SERVICES'
+2025-01-23 09:45:33,593 - config - DEBUG - Get environment variable 'BASE_URL'
+2025-01-23 09:45:33,593 - config - DEBUG - Get environment variable 'PORT_SERVICE'
+2025-01-23 09:45:33,606 - config - INFO - Settings: {'PROJECT_NAME': 'TEST', 'DEBUG': True, 'BASE_DIR': WindowsPath('C:/'), 'DATABASE_DB': 'postgresql', 'DATABASE_DRIVER': 'postgresql+asyncpg', 'DATABASE_POOL_SIZE': 5, 'DATABASE_MAX_OVERFLOW': 10, 'DATABASE_HOST': 'localhost', 'DATABASE_PORT': '5432', 'DATABASE_USER': 'postgres', 'DATABASE_PASSWORD': 'Qwertyboy31', 'DATABASE_FILE_NAME': None, 'DATABASE_NAME': 'openverse_users', 'REDIS_HOST': 'redis', 'REDIS_PORT': 6379, 'REDIS_DB': 0, 'JWT_ALGORITHM': 'HS256', 'OTHER_SERVICES': 'AUTHETICATION, USERS', 'BASE_URL': 'localhost', 'PORT_SERVICE': '8000', 'SESSION_TTL': 3600}
+2025-01-23 09:45:33,606 - config - INFO - PROJECT_NAME: TEST
+2025-01-23 09:45:33,606 - config - INFO - DEBUG: True
+2025-01-23 09:45:33,606 - config - INFO - BASE_DIR: C:\
+2025-01-23 09:45:33,606 - config - INFO - DATABASE_DB: postgresql
+2025-01-23 09:45:33,606 - config - INFO - DATABASE_DRIVER: postgresql+asyncpg
+2025-01-23 09:45:33,606 - config - INFO - DATABASE_POOL_SIZE: 5
+2025-01-23 09:45:33,606 - config - INFO - DATABASE_MAX_OVERFLOW: 10
+2025-01-23 09:45:33,606 - config - INFO - DATABASE_HOST: localhost
+2025-01-23 09:45:33,606 - config - INFO - DATABASE_PORT: 5432
+2025-01-23 09:45:33,606 - config - INFO - DATABASE_USER: postgres
+2025-01-23 09:45:33,608 - config - INFO - DATABASE_PASSWORD: Qwertyboy31
+2025-01-23 09:45:33,608 - config - INFO - DATABASE_FILE_NAME: None
+2025-01-23 09:45:33,608 - config - INFO - DATABASE_NAME: openverse_users
+2025-01-23 09:45:33,608 - config - INFO - REDIS_HOST: redis
+2025-01-23 09:45:33,608 - config - INFO - REDIS_PORT: 6379
+2025-01-23 09:45:33,608 - config - INFO - REDIS_DB: 0
+2025-01-23 09:45:33,609 - config - INFO - JWT_ALGORITHM: HS256
+2025-01-23 09:45:33,609 - config - INFO - OTHER_SERVICES: AUTHETICATION, USERS
+2025-01-23 09:45:33,609 - config - INFO - BASE_URL: localhost
+2025-01-23 09:45:33,609 - config - INFO - PORT_SERVICE: 8000
+2025-01-23 09:45:33,610 - config - INFO - SESSION_TTL: 3600
+2025-01-23 09:48:26,140 - config - DEBUG - Get environment variable 'PROJECT_NAME'
+2025-01-23 09:48:26,141 - config - DEBUG - Get environment variable 'DEBUG'
+2025-01-23 09:48:26,141 - config - DEBUG - Get environment variable 'DATABASE_NAME'
+2025-01-23 09:48:26,141 - config - DEBUG - Get environment variable 'DATABASE_DRIVER'
+2025-01-23 09:48:26,141 - config - DEBUG - Get environment variable 'DATABASE_HOST'
+2025-01-23 09:48:26,141 - config - DEBUG - Get environment variable 'DATABASE_PORT'
+2025-01-23 09:48:26,141 - config - DEBUG - Get environment variable 'DATABASE_USER'
+2025-01-23 09:48:26,141 - config - DEBUG - Get environment variable 'DATABASE_PASSWORD'
+2025-01-23 09:48:26,141 - config - DEBUG - Get environment variable 'DATABASE_FILE_NAME'
+2025-01-23 09:48:26,141 - config - DEBUG - Get environment variable 'DATABASE_NAME'
+2025-01-23 09:48:26,141 - config - DEBUG - Get environment variable 'REDIS_HOST'
+2025-01-23 09:48:26,141 - config - DEBUG - Get environment variable 'REDIS_PORT'
+2025-01-23 09:48:26,141 - config - DEBUG - Get environment variable 'REDIS_DB'
+2025-01-23 09:48:26,141 - config - DEBUG - Get environment variable 'REDIS_PASSWORD'
+2025-01-23 09:48:26,141 - config - DEBUG - Get environment variable 'JWT_ALGORITHM'
+2025-01-23 09:48:26,141 - config - DEBUG - Get environment variable 'JWT_SECRET_KEY'
+2025-01-23 09:48:26,142 - config - DEBUG - Get environment variable 'OTHER_SERVICES'
+2025-01-23 09:48:26,142 - config - DEBUG - Get environment variable 'BASE_URL'
+2025-01-23 09:48:26,142 - config - DEBUG - Get environment variable 'PORT_SERVICE'
+2025-01-23 09:48:26,148 - config - INFO - Settings: {'PROJECT_NAME': 'TEST', 'DEBUG': True, 'BASE_DIR': WindowsPath('C:/'), 'DATABASE_DB': 'postgresql', 'DATABASE_DRIVER': 'postgresql+asyncpg', 'DATABASE_POOL_SIZE': 5, 'DATABASE_MAX_OVERFLOW': 10, 'DATABASE_HOST': 'localhost', 'DATABASE_PORT': '5432', 'DATABASE_USER': 'postgres', 'DATABASE_PASSWORD': 'Qwertyboy31', 'DATABASE_FILE_NAME': None, 'DATABASE_NAME': 'openverse_users', 'REDIS_HOST': 'redis', 'REDIS_PORT': 6379, 'REDIS_DB': 0, 'JWT_ALGORITHM': 'HS256', 'OTHER_SERVICES': 'AUTHETICATION, USERS', 'BASE_URL': 'localhost', 'PORT_SERVICE': '8000', 'SESSION_TTL': 3600}
+2025-01-23 09:48:26,148 - config - INFO - PROJECT_NAME: TEST
+2025-01-23 09:48:26,148 - config - INFO - DEBUG: True
+2025-01-23 09:48:26,148 - config - INFO - BASE_DIR: C:\
+2025-01-23 09:48:26,149 - config - INFO - DATABASE_DB: postgresql
+2025-01-23 09:48:26,149 - config - INFO - DATABASE_DRIVER: postgresql+asyncpg
+2025-01-23 09:48:26,149 - config - INFO - DATABASE_POOL_SIZE: 5
+2025-01-23 09:48:26,149 - config - INFO - DATABASE_MAX_OVERFLOW: 10
+2025-01-23 09:48:26,149 - config - INFO - DATABASE_HOST: localhost
+2025-01-23 09:48:26,150 - config - INFO - DATABASE_PORT: 5432
+2025-01-23 09:48:26,150 - config - INFO - DATABASE_USER: postgres
+2025-01-23 09:48:26,150 - config - INFO - DATABASE_PASSWORD: Qwertyboy31
+2025-01-23 09:48:26,150 - config - INFO - DATABASE_FILE_NAME: None
+2025-01-23 09:48:26,151 - config - INFO - DATABASE_NAME: openverse_users
+2025-01-23 09:48:26,151 - config - INFO - REDIS_HOST: redis
+2025-01-23 09:48:26,151 - config - INFO - REDIS_PORT: 6379
+2025-01-23 09:48:26,151 - config - INFO - REDIS_DB: 0
+2025-01-23 09:48:26,151 - config - INFO - JWT_ALGORITHM: HS256
+2025-01-23 09:48:26,152 - config - INFO - OTHER_SERVICES: AUTHETICATION, USERS
+2025-01-23 09:48:26,152 - config - INFO - BASE_URL: localhost
+2025-01-23 09:48:26,152 - config - INFO - PORT_SERVICE: 8000
+2025-01-23 09:48:26,152 - config - INFO - SESSION_TTL: 3600
+2025-01-23 09:48:50,226 - config - DEBUG - Get environment variable 'PROJECT_NAME'
+2025-01-23 09:48:50,226 - config - DEBUG - Get environment variable 'DEBUG'
+2025-01-23 09:48:50,226 - config - DEBUG - Get environment variable 'DATABASE_NAME'
+2025-01-23 09:48:50,226 - config - DEBUG - Get environment variable 'DATABASE_DRIVER'
+2025-01-23 09:48:50,226 - config - DEBUG - Get environment variable 'DATABASE_HOST'
+2025-01-23 09:48:50,226 - config - DEBUG - Get environment variable 'DATABASE_PORT'
+2025-01-23 09:48:50,227 - config - DEBUG - Get environment variable 'DATABASE_USER'
+2025-01-23 09:48:50,227 - config - DEBUG - Get environment variable 'DATABASE_PASSWORD'
+2025-01-23 09:48:50,227 - config - DEBUG - Get environment variable 'DATABASE_FILE_NAME'
+2025-01-23 09:48:50,227 - config - DEBUG - Get environment variable 'DATABASE_NAME'
+2025-01-23 09:48:50,227 - config - DEBUG - Get environment variable 'REDIS_HOST'
+2025-01-23 09:48:50,227 - config - DEBUG - Get environment variable 'REDIS_PORT'
+2025-01-23 09:48:50,227 - config - DEBUG - Get environment variable 'REDIS_DB'
+2025-01-23 09:48:50,227 - config - DEBUG - Get environment variable 'REDIS_PASSWORD'
+2025-01-23 09:48:50,227 - config - DEBUG - Get environment variable 'JWT_ALGORITHM'
+2025-01-23 09:48:50,227 - config - DEBUG - Get environment variable 'JWT_SECRET_KEY'
+2025-01-23 09:48:50,227 - config - DEBUG - Get environment variable 'OTHER_SERVICES'
+2025-01-23 09:48:50,227 - config - DEBUG - Get environment variable 'BASE_URL'
+2025-01-23 09:48:50,227 - config - DEBUG - Get environment variable 'PORT_SERVICE'
+2025-01-23 09:48:50,234 - config - INFO - Settings: {'PROJECT_NAME': 'TEST', 'DEBUG': True, 'BASE_DIR': WindowsPath('C:/'), 'DATABASE_DB': 'postgresql', 'DATABASE_DRIVER': 'postgresql+asyncpg', 'DATABASE_POOL_SIZE': 5, 'DATABASE_MAX_OVERFLOW': 10, 'DATABASE_HOST': 'localhost', 'DATABASE_PORT': '5432', 'DATABASE_USER': 'postgres', 'DATABASE_PASSWORD': 'Qwertyboy31', 'DATABASE_FILE_NAME': None, 'DATABASE_NAME': 'openverse_users', 'REDIS_HOST': 'redis', 'REDIS_PORT': 6379, 'REDIS_DB': 0, 'JWT_ALGORITHM': 'HS256', 'OTHER_SERVICES': 'AUTHETICATION, USERS', 'BASE_URL': 'localhost', 'PORT_SERVICE': '8000', 'SESSION_TTL': 3600}
+2025-01-23 09:48:50,234 - config - INFO - PROJECT_NAME: TEST
+2025-01-23 09:48:50,234 - config - INFO - DEBUG: True
+2025-01-23 09:48:50,234 - config - INFO - BASE_DIR: C:\
+2025-01-23 09:48:50,236 - config - INFO - DATABASE_DB: postgresql
+2025-01-23 09:48:50,236 - config - INFO - DATABASE_DRIVER: postgresql+asyncpg
+2025-01-23 09:48:50,236 - config - INFO - DATABASE_POOL_SIZE: 5
+2025-01-23 09:48:50,236 - config - INFO - DATABASE_MAX_OVERFLOW: 10
+2025-01-23 09:48:50,237 - config - INFO - DATABASE_HOST: localhost
+2025-01-23 09:48:50,237 - config - INFO - DATABASE_PORT: 5432
+2025-01-23 09:48:50,237 - config - INFO - DATABASE_USER: postgres
+2025-01-23 09:48:50,237 - config - INFO - DATABASE_PASSWORD: Qwertyboy31
+2025-01-23 09:48:50,237 - config - INFO - DATABASE_FILE_NAME: None
+2025-01-23 09:48:50,238 - config - INFO - DATABASE_NAME: openverse_users
+2025-01-23 09:48:50,238 - config - INFO - REDIS_HOST: redis
+2025-01-23 09:48:50,238 - config - INFO - REDIS_PORT: 6379
+2025-01-23 09:48:50,238 - config - INFO - REDIS_DB: 0
+2025-01-23 09:48:50,238 - config - INFO - JWT_ALGORITHM: HS256
+2025-01-23 09:48:50,239 - config - INFO - OTHER_SERVICES: AUTHETICATION, USERS
+2025-01-23 09:48:50,239 - config - INFO - BASE_URL: localhost
+2025-01-23 09:48:50,239 - config - INFO - PORT_SERVICE: 8000
+2025-01-23 09:48:50,239 - config - INFO - SESSION_TTL: 3600

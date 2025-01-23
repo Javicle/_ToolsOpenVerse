@@ -11,7 +11,7 @@ from fastapi import HTTPException, status
 from pydantic import BaseModel
 
 from .config import settings
-from .types import RoutesNamespaceTypes
+from .types import JSONResponseType, RoutesNamespaceTypes
 
 
 class UsersRoutes(str, Enum):
@@ -216,14 +216,14 @@ class SetRequest:
         route_name: RoutesTypes,
         route_method: HttpMethods,
         data: Optional[BaseModel] = None,
-    ) -> Any:
+    ) -> JSONResponseType:
         """
         Sends HTTP request to the specified service endpoint.
 
         Args:
-            service_name: Service identifier
-            route_name: Route identifier
-            route_method: HTTP method to use
+            service_name: Service identifier use ServiceName
+            route_name: Route identifier use UsersRoutes | AuthenticationRoutes
+            route_method: HTTP method to use, use HttpMethods
             data: Optional request body data
 
         Returns:
