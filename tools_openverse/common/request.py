@@ -11,7 +11,12 @@ from fastapi import HTTPException, status
 from pydantic import BaseModel
 
 from .config import settings
-from .types import JSONResponseType, RoutesNamespaceTypes
+from .types import (
+    ErrorResponse,
+    JSONResponseTypes,
+    RoutesNamespaceTypes,
+    SuccessResponse,
+)
 
 
 class UsersRoutes(str, Enum):
@@ -216,7 +221,7 @@ class SetRequest:
         route_name: RoutesTypes,
         route_method: HttpMethods,
         data: Optional[BaseModel] = None,
-    ) -> JSONResponseType:
+    ) -> JSONResponseTypes:
         """
         Sends HTTP request to the specified service endpoint.
 
@@ -243,16 +248,27 @@ class SetRequest:
                 print(
                     f"[DEBUG] Response status: {response.status_code}, Response body: {response.text}"
                 )  # Debug info
-                return response.json()
+
+                result = response.json()
+
+                if "error" in result and result["error"]:
+                    return ErrorResponse(**result)
+
+                elif "successs" in result and result["success"]:
+                    return SuccessResponse(**result)
+
             except httpx.TimeoutException:
                 raise BaseRequestException(
                     message="Request timed out", status_code=status.HTTP_504_GATEWAY_TIMEOUT
                 )
+
             except httpx.RequestError as e:
                 raise BaseRequestException(
                     message=f"Request failed: {e}",
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 )
+
+            return ErrorResponse(error="Unexpected error")
 
 
 class CreateUserRequest(BaseModel):

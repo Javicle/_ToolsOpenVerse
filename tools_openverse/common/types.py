@@ -1,8 +1,8 @@
 from datetime import datetime, timedelta
-from typing import Any, Generic, Literal, Optional, TypeAlias, TypeVar, Union
+from typing import Any, Literal, Optional, TypeAlias, TypeVar, Union
 from uuid import UUID
 
-from pydantic import BaseModel, EmailStr, field_validator
+from pydantic import BaseModel, EmailStr
 
 J = TypeVar("J", bound=BaseModel | dict[Any, Any] | str)
 
@@ -74,13 +74,13 @@ AuthenticationRoutesTypes = Literal["GET_ACCESS_TOKEN", "GET_REFRESH_TOKEN", "GE
 
 RoutesNamespaceTypes = Union[UsersRoutesTypes, AuthenticationRoutesTypes]
 
-JSONResponseType: TypeAlias = dict[Literal["detail"], Union[BaseModel, str, dict[Any, Any]]]
+
+class ErrorResponse(BaseModel):
+    error: str
 
 
-class JSONResponse(BaseModel, Generic[J]):
-    detail: str
-    value: J
+class SuccessResponse(BaseModel):
+    detail: dict[Any, Any]
 
-    @field_validator("value", mode="before")
-    def validate_value(self, value: str):
-        return value.model_dump() if isinstance(value, BaseModel) else value
+
+JSONResponseTypes = SuccessResponse | ErrorResponse
