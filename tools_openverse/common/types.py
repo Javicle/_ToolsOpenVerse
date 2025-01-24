@@ -1,10 +1,10 @@
 from datetime import datetime, timedelta
-from typing import Any, Literal, Optional, TypeAlias, TypeVar, Union
+from typing import Any, Generic, Literal, Optional, TypeAlias, TypeVar, Union
 from uuid import UUID
 
 from pydantic import BaseModel, EmailStr, field_validator
 
-J = TypeVar("J")
+J = TypeVar("J", bound=BaseModel | dict[Any, Any] | str)
 
 Id: TypeAlias = Union[str, UUID]
 Login: TypeAlias = str
@@ -77,9 +77,9 @@ RoutesNamespaceTypes = Union[UsersRoutesTypes, AuthenticationRoutesTypes]
 JSONResponseType: TypeAlias = dict[Literal["detail"], Union[BaseModel, str, dict[Any, Any]]]
 
 
-class JSONResponse(BaseModel):
+class JSONResponse(BaseModel, Generic[J]):
     detail: str
-    value: dict[str, Any] | BaseModel | str
+    value: J
 
     @field_validator("value", mode="before")
     def validate_value(self, value: str):
