@@ -268,7 +268,9 @@ class SetRequest:
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 )
 
-            return ErrorResponse(error="Unexpected error")
+            return ErrorResponse(
+                error="Unexpected error", status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
 class CreateUserRequest(BaseModel):
