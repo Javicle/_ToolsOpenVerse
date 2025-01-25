@@ -238,24 +238,22 @@ class SetRequest:
             BaseRequestException: For request timeouts or failures
         """
         url = await self._get_url(service_name=service_name, route_name=route_name)
-        print(f"[DEBUG] Sending {route_method.value} request to URL: {url}")  # Debug info
 
         async with httpx.AsyncClient(timeout=self.timeout) as client:
             try:
                 response = await client.request(
                     method=route_method.value, url=url, json=data.model_dump() if data else None
                 )
-                print(
-                    f"[DEBUG] Response status: {response.status_code}, Response body: {response.text}"
-                )  # Debug info
 
                 result = response.json()
 
-                if "error" in result and result["error"]:
-                    return ErrorResponse(**result)
+                if "detail" in result and result["detail"]:
+                    return ErrorResponse(error=result["detail"], status_code=response.status_code)
 
-                elif "successs" in result and result["success"]:
-                    return SuccessResponse(**result)
+                elif "detail" not in result:
+                    return SuccessResponse(
+                        detail=result, success=True, status_code=response.status_code
+                    )
 
             except httpx.TimeoutException:
                 raise BaseRequestException(

@@ -8,6 +8,7 @@ from tools_openverse.common.request import (
     ServiceName,
     SetRequest,
 )
+from tools_openverse.common.types import ErrorResponse
 
 
 async def main():
@@ -15,7 +16,10 @@ async def main():
 
     # Создание пользователя
     test_data = CreateUserRequest(
-        login="testgted", name="", password="test123", email="test@test.com"
+        login="testgtedgfdhgfGfdweDFGD",
+        name="Login",
+        password="tesAt1@23",
+        email="testt@dfeFDSst.com",
     )
 
     print(ServiceName.USERS, RoutesNamespace.USERS.CREATE_USER.value)
@@ -27,7 +31,11 @@ async def main():
             route_method=HttpMethods.POST,
             data=test_data,
         )
-        print(f"Success: {result}")
+
+        if isinstance(result, ErrorResponse):
+            print(f"Error: {result.error}")
+        else:
+            print(f"Success: {result}")
     except BaseRequestException as e:
         print(f"Error: {e.detail}")
 

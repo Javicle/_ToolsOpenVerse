@@ -83,6 +83,7 @@ class ErrorResponse(BaseModel):
 class SuccessResponse(BaseModel):
     detail: dict[str, Any]
     success: bool = Field(default=True)
+    status_code: int = Field(description="HTTP status code")
 
 
 JSONResponseTypes = SuccessResponse | ErrorResponse
