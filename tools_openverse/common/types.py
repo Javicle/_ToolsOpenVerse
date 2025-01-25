@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from typing import Any, Literal, Optional, TypeAlias, TypeVar, Union
 from uuid import UUID
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 
 J = TypeVar("J", bound=BaseModel | dict[Any, Any] | str)
 
@@ -76,11 +76,13 @@ RoutesNamespaceTypes = Union[UsersRoutesTypes, AuthenticationRoutesTypes]
 
 
 class ErrorResponse(BaseModel):
-    error: str
+    error: str = Field(..., description="Error message")
+    status_code: Optional[int] = Field(None, description="Optional HTTP status code")
 
 
 class SuccessResponse(BaseModel):
-    detail: dict[Any, Any]
+    detail: dict[str, Any]
+    success: bool = Field(default=True)
 
 
 JSONResponseTypes = SuccessResponse | ErrorResponse
