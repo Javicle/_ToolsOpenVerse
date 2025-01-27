@@ -4,9 +4,9 @@ from functools import cache
 from pathlib import Path
 from typing import Any, ClassVar, Optional
 
-from dotenv import find_dotenv
+from dotenv import find_dotenv, load_dotenv
 from pydantic import field_validator
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings
 from redis.asyncio import Redis  # type: ignore[PylancereportUnknownVariableType]
 from redis.asyncio import from_url  # type: ignore[PylancereportUnknownVariableType]
 
@@ -15,10 +15,12 @@ from tools_openverse.common.logger_ import setup_logger
 logger = setup_logger("config")
 
 
+load_dotenv(find_dotenv(filename=".env", raise_error_if_not_found=True))
+
+
 def get_env_value(key: str) -> Any:
     """Получаем значение переменной окружения"""
 
-    logger.debug(f"Get environment variable '{key}'")
     result = os.getenv(key)
     if not result:
         return None
@@ -31,7 +33,10 @@ class Settings(BaseSettings):
 
     # Paths
     BASE_DIR: Path = Path(__file__).parent.parent.parent.parent.parent.parent
+    print("-" * 100)
+    print(f"BASE_DIR: {BASE_DIR}")
 
+    print("-" * 100)
     # Database
     ALLOWED_DATABASES: ClassVar[list[str]] = ["sqlite3", "postgresql"]
 
@@ -65,11 +70,10 @@ class Settings(BaseSettings):
     # Session
     SESSION_TTL: int = 3600
 
-    model_config = SettingsConfigDict(
-        env_file=find_dotenv(filename=".env", raise_error_if_not_found=True),
-        env_file_encoding="utf-8",
-        case_sensitive=True,
-    )
+    print("-" * 100)
+    print(f"ENV: {find_dotenv(filename=".env", raise_error_if_not_found=True)}")
+
+    print("-" * 100)
 
     @property
     def database_url(self) -> Optional[str]:
