@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any, ClassVar, Optional
 
 from dotenv import find_dotenv, load_dotenv
-from pydantic import field_validator
+from pydantic import Field, field_validator, model_validator
 from pydantic_settings import BaseSettings
 from redis.asyncio import Redis  # type: ignore[PylancereportUnknownVariableType]
 from redis.asyncio import from_url  # type: ignore[PylancereportUnknownVariableType]
@@ -33,10 +33,7 @@ class Settings(BaseSettings):
 
     # Paths
     BASE_DIR: Path = Path(__file__).parent.parent.parent.parent.parent.parent
-    print("-" * 100)
-    print(f"BASE_DIR: {BASE_DIR}")
 
-    print("-" * 100)
     # Database
     ALLOWED_DATABASES: ClassVar[list[str]] = ["sqlite3", "postgresql"]
 
@@ -65,15 +62,13 @@ class Settings(BaseSettings):
     ALL_SERVICES: ClassVar[list[str]] = ["USERS, AUTHETICATION, TEST"]
     OTHER_SERVICES: str = get_env_value("OTHER_SERVICES")
     BASE_URL: str = get_env_value("BASE_URL")
-    PORT_SERVICE: str | int = get_env_value("PORT_SERVICE")
+    PORT_SERVICE: str | int | None = Field(default=None)
+
+    PORT_SERVICE_AUTH: str | int | None = get_env_value("PORT_SERVICE_AUTH")
+    PORT_SERVICE_USERS: str | int | None = get_env_value("PORT_SERVICE_TEST")
 
     # Session
     SESSION_TTL: int = 3600
-
-    print("-" * 100)
-    print(f"ENV: {find_dotenv(filename=".env", raise_error_if_not_found=True)}")
-
-    print("-" * 100)
 
     @property
     def database_url(self) -> Optional[str]:
@@ -140,6 +135,28 @@ class Settings(BaseSettings):
                 raise ValueError("Missing DATABASE_FILE_NAME for SQLite")
 
         return value
+
+    @model_validator(mode="before")
+    @classmethod
+    def validate_port_services(cls, values: dict[str, Any]) -> dict[str, Any]:
+        """Валидация портов для сервисов"""
+        if values.get("PROJECT_NAME") == "USERS":
+            if not values.get("PORT_SERVICE_USERS"):
+                raise ValueError("PORT_SERVICE_USERS is required for USERS service")
+            values["PORT_SERVICE"] = values["PORT_SERVICE_USERS"]
+
+        elif values.get("PROJECT_NAME") == "AUTHETICATION":
+            if not values.get("PORT_SERVICE_AUTH"):
+                raise ValueError("PORT_SERVICE_AUTH is required for AUTHETICATION service")
+            values["PORT_SERVICE"] = values["PORT_SERVICE_AUTH"]
+
+        else:
+            if not values.get("PORT_SERVICE_AUTH") and not values.get("PORT_SERVICE_USERS"):
+                raise ValueError(
+                    "PORT_SERVICE_AUTH or PORT_SERVICE_USERS is required for TEST service"
+                )
+
+        return values
 
 
 @cache

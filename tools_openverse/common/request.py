@@ -23,7 +23,7 @@ class UsersRoutes(str, Enum):
     """Enumeration of available user service routes."""
 
     CREATE_USER = "/users/create"
-    GET_USER_BY_ID = "/users/{id}"
+    GET_USER_BY_ID = "/users/get/{id}"
     GET_USER_BY_LOGIN = "/users/login/{user_login}"
     UPDATE_USER = "/users/update"
     DELETE_USER_BY_ID = "/users/delete/{user_id}"
@@ -44,6 +44,20 @@ class ServiceName(str, Enum):
 
     USERS = "USERS"
     AUTHENTICATION = "AUTHENTICATION"
+
+
+class _HttpRoutesMethods(str, Enum):
+    CREATE_USER = "POST"
+    GET_USER_BY_ID = "GET"
+    GET_USER_BY_LOGIN = "GET"
+    UPDATE_USER = "PUT"
+    DELETE_USER_BY_ID = "DELETE"
+    DELETE_USER_BY_LOGIN = "DELETE"
+    HEALTH = "GET"
+
+    GET_ACCESS_TOKEN = "GET"
+    GET_REFRESH_TOKEN = "GET"
+    GET_USER_INFO = "GET"
 
 
 RoutesTypes = Union[UsersRoutes, AuthenticationRoutes, RoutesNamespaceTypes]
@@ -83,6 +97,7 @@ class RoutesNamespace:
             ValueError: If service or route is not found
         """
 
+        print("[DEBUG] Сработал метод get_route")  # Debug info
         service_value = (
             service.value.upper() if isinstance(service, ServiceName) else service.upper()
         )
@@ -91,21 +106,27 @@ class RoutesNamespace:
         if route_service is None:
             raise ValueError(f"Unknown service: {service}")
 
+        print("-" * 100)
+        print(
+            f"Service: {service_value}, Route: {route_name.value if isinstance(route_name, (UsersRoutes | AuthenticationRoutes)) else route_name}, Params: {params}"
+        )
+        print("-" * 100)
+
         try:
-            if isinstance(route_name, (UsersRoutes, AuthenticationRoutes)) and isinstance(
-                service, ServiceName
-            ):
+            if isinstance(route_name, (UsersRoutes, AuthenticationRoutes)):
+
                 route = route_name.value
 
             else:
-                route = route_service[route_name.upper()].value
+                route = route_service[route_name].value
 
         except AttributeError as e:
             raise ValueError(f"Unknown endpoint: {route_name} in service: {service}, {e}")
         except KeyError as e:
             raise ValueError(f"Unknown attribute or incorrect format: {e}")
 
-        return route.format(**(params or {}))
+        print(f"КОНЕЧНАЯ ССЫЛКА:  {route.format(**params if params else {})}")  # debug print
+        return route.format(**params if params else {})
 
 
 class HttpMethods(str, Enum):
@@ -115,6 +136,14 @@ class HttpMethods(str, Enum):
     POST = "POST"
     PUT = "PUT"
     DELETE = "DELETE"
+    PATCH = "PATCH"
+
+
+class ServicesPorts(str, Enum):
+    """Available service ports for routing."""
+
+    USERS = settings.PORT_SERVICE_USERS
+    AUTHENTICATION = settings.PORT_SERVICE_AUTH
 
 
 class BaseRequestException(HTTPException):
@@ -153,8 +182,42 @@ class SetRequest:
     def __init__(self, timeout: float = 10.0) -> None:
         self.timeout = timeout
 
+    @staticmethod
+    async def validate_http_method(route_name: RoutesTypes, route_method: HttpMethods) -> None:
+        """
+        Validates if the given HTTP method is allowed for the specified route.
+
+        Args:
+            route_name: The route to validate.
+            route_method: The HTTP method to check.
+
+        Raises:
+            ValueError: If the method does not match the expected value.
+        """
+        try:
+            route_name = (  # CREATE_USER
+                route_name.name
+                if isinstance(route_name, UsersRoutes | AuthenticationRoutes)
+                else route_name
+            )
+
+            expected_method = getattr(_HttpRoutesMethods, route_name).value
+            if expected_method != route_method.value:
+                raise ValueError(
+                    f"Invalid HTTP method {route_method.value} for route {route_name.value if isinstance(route_name, UsersRoutes| AuthenticationRoutes) else route_name}. "
+                    f"Expected: {expected_method}"
+                )
+        except KeyError:
+            raise ValueError(
+                f"Route {route_name.value if isinstance(route_name, UsersRoutes| AuthenticationRoutes) else route_name} not found in _HttpRoutesMethods"
+            )
+
     async def _get_url(
-        self, service_name: ServiceName | str, route_name: RoutesTypes, **params: Optional[Any]
+        self,
+        service_name: ServiceName | str,
+        route_name: RoutesTypes,
+        params: dict[str, Any] | None,
+        route_method: HttpMethods,
     ) -> str:
         """
         Constructs full URL for the API request.
@@ -170,6 +233,8 @@ class SetRequest:
         Raises:
             BaseRequestException: If service or route is invalid
         """
+        route = None
+
         service_name = (
             service_name.value
             if isinstance(service_name, ServiceName)
@@ -185,6 +250,8 @@ class SetRequest:
             route = RoutesNamespace.get_route(
                 service=service_name, route_name=route_name, params=params
             )
+        else:
+            route = route_name.lstrip("/")
 
         if not service_name and not route_name:
             raise BaseRequestException(
@@ -197,30 +264,28 @@ class SetRequest:
             base_url = f"http://{base_url}"
 
         base_url = base_url.rstrip("/")
-        route = route_name.lstrip("/")
 
-        if params:
-            try:
-                route = route.format(**params)
-            except KeyError as e:
-                raise BaseRequestException(
-                    message=f"Missing URL parameter: {e}", status_code=status.HTTP_400_BAD_REQUEST
-                )
+        service_port: str | int = getattr(ServicesPorts, service_name).value
 
-        final_url = (
-            f"{base_url}:{settings.PORT_SERVICE}/{route}"
-            if settings.PORT_SERVICE
-            else f"{base_url}/{route}"
-        )
-        print(f"[DEBUG] Constructed URL: {final_url}")  # Debug info
-        return final_url
+        if service_port:
+            print(f"[DEBUG] Service port: {service_port}")  # Debug info
+            final_url = (
+                f"{base_url}:{service_port}{route}" if service_port else f"{base_url}/{route}"
+            )
+            print(f"[DEBUG] Constructed URL: {final_url}")  # Debug info
+            return final_url
+        else:
+            raise BaseRequestException(
+                message=f"Service port not found for service {service_name}",
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
 
     async def send_request(
         self,
         service_name: ServiceName,
         route_name: RoutesTypes,
         route_method: HttpMethods,
-        data: Optional[BaseModel] = None,
+        request_data: Optional[BaseModel] = None,
     ) -> JSONResponseTypes:
         """
         Sends HTTP request to the specified service endpoint.
@@ -237,12 +302,30 @@ class SetRequest:
         Raises:
             BaseRequestException: For request timeouts or failures
         """
-        url = await self._get_url(service_name=service_name, route_name=route_name)
+
+        await self.validate_http_method(route_name=route_name, route_method=route_method)
+
+        url = await self._get_url(
+            service_name=service_name,
+            route_name=route_name,
+            params=request_data.model_dump(exclude_none=True) if request_data else None,
+            route_method=route_method,
+        )
 
         async with httpx.AsyncClient(timeout=self.timeout) as client:
             try:
+                print(
+                    f"ДЛЯ ОТКЛАДКИ: Method {route_method.value}, URL {url}, JSON {request_data if route_method.value == "POST" else None}"
+                )  # Debug info
+
                 response = await client.request(
-                    method=route_method.value, url=url, json=data.model_dump() if data else None
+                    method=route_method.value,
+                    url=url,
+                    json=(
+                        request_data.model_dump(exclude_none=True)
+                        if route_method.value in ["POST", "PUT", "PATCH"] and request_data
+                        else None
+                    ),
                 )
 
                 result = response.json()
@@ -283,6 +366,6 @@ class CreateUserRequest(BaseModel):
 class GetUserRequest(BaseModel):
     """Request model for user retrieval."""
 
-    id: Optional[int]
-    login: Optional[str]
-    name: Optional[str]
+    id: Optional[int | str] = None
+    login: Optional[str] = None
+    name: Optional[str] = None

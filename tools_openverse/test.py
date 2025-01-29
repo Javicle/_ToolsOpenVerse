@@ -3,6 +3,7 @@ import asyncio
 from tools_openverse.common.request import (
     BaseRequestException,
     CreateUserRequest,
+    GetUserRequest,
     HttpMethods,
     RoutesNamespace,
     ServiceName,
@@ -14,7 +15,6 @@ from tools_openverse.common.types import ErrorResponse
 async def main():
     request_client = SetRequest(timeout=5.0)
 
-    # Создание пользователя
     test_data = CreateUserRequest(
         login="testgtedgfdhgfGfdweDFGD",
         name="Login",
@@ -22,14 +22,21 @@ async def main():
         email="testt@dfeFDSst.com",
     )
 
-    print(ServiceName.USERS, RoutesNamespace.USERS.CREATE_USER.value)
+    # Получение пользователя
+    # test_data = GetUserRequest(
+    #     id="8f9402e9-34fa-41ac-9ca2-5e85f95d2e68",
+    # )
+
+    print(
+        f"Для откладки : {ServiceName.USERS} {RoutesNamespace.USERS.GET_USER_BY_ID} {HttpMethods.POST} {test_data}"
+    )
 
     try:
         result = await request_client.send_request(
             service_name=ServiceName.USERS,
             route_name=RoutesNamespace.USERS.CREATE_USER,
             route_method=HttpMethods.POST,
-            data=test_data,
+            request_data=test_data,
         )
 
         if isinstance(result, ErrorResponse):
