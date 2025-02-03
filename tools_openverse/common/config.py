@@ -7,8 +7,7 @@ from typing import Any, ClassVar, Optional
 from dotenv import find_dotenv, load_dotenv
 from pydantic import Field, field_validator, model_validator
 from pydantic_settings import BaseSettings
-from redis.asyncio import Redis  # type: ignore[PylancereportUnknownVariableType]
-from redis.asyncio import from_url  # type: ignore[PylancereportUnknownVariableType]
+from redis.asyncio import Redis, from_url
 
 from tools_openverse.common.logger_ import setup_logger
 
@@ -124,11 +123,17 @@ class Settings(BaseSettings):
             raise ValueError(f"Database {value}must be one of {Settings.ALLOWED_DATABASES}")
 
         if value == "postgresql":
-            required_vars = ["DATABASE_HOST", "DATABASE_PORT", "DATABASE_USER", "DATABASE_PASSWORD"]
+            required_vars = [
+                "DATABASE_HOST",
+                "DATABASE_PORT",
+                "DATABASE_USER",
+                "DATABASE_PASSWORD",
+            ]
             missing_vars = [var for var in required_vars if not os.getenv(var)]
             if missing_vars:
                 raise ValueError(
-                    f"Missing required environment variables for PostgreSQL: {', '.join(missing_vars)}"
+                    f"Missing required environment variables for PostgreSQL: {
+                        ', '.join(missing_vars)}"
                 )
         elif value == "sqlite3":
             if not os.getenv("DATABASE_FILE_NAME"):
@@ -177,4 +182,6 @@ async def get_redis() -> Redis:
     Создаем подключение к Redis с настройками из конфигурации
     """
 
-    return await from_url(settings.redis_url, decode_responses=True, encoding="utf-8")
+    return await from_url(  # type: ignore
+        settings.redis_url, decode_responses=True, encoding="utf-8"
+    )

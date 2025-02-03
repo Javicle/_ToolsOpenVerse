@@ -28,6 +28,7 @@ class UsersRoutes(str, Enum):
     UPDATE_USER = "/users/update"
     DELETE_USER_BY_ID = "/users/delete/{user_id}"
     DELETE_USER_BY_LOGIN = "/users/delete/login/{user_login}"
+    LOG_IN = "/users/log_in"
     HEALTH = "/health"
 
 
@@ -54,6 +55,7 @@ class _HttpRoutesMethods(str, Enum):
     DELETE_USER_BY_ID = "DELETE"
     DELETE_USER_BY_LOGIN = "DELETE"
     HEALTH = "GET"
+    LOG_IN = "POST"
 
     GET_ACCESS_TOKEN = "GET"
     GET_REFRESH_TOKEN = "GET"
@@ -99,33 +101,38 @@ class RoutesNamespace:
 
         print("[DEBUG] Сработал метод get_route")  # Debug info
         service_value = (
-            service.value.upper() if isinstance(service, ServiceName) else service.upper()
+            service.value.upper()
+            if isinstance(service, ServiceName)
+            else service.upper()
         )
         route_service = getattr(cls, service_value, None)
 
         if route_service is None:
             raise ValueError(f"Unknown service: {service}")
 
-        print("-" * 100)
-        print(
-            f"Service: {service_value}, Route: {route_name.value if isinstance(route_name, (UsersRoutes | AuthenticationRoutes)) else route_name}, Params: {params}"
-        )
-        print("-" * 100)
-
         try:
             if isinstance(route_name, (UsersRoutes, AuthenticationRoutes)):
 
-                route = route_name.value
+                route = str(route_name.value)
 
             else:
-                route = route_service[route_name].value
+                route = str(route_service[route_name].value)
+
+            if "{" in route and "}" in route:
+                if not params:
+                    raise ValueError("Missing parameters for route")
+                print(f"КОНЕЧНАЯ ССЫЛКА:  {route.format(**params)}")  # debug print
+                route = route.format(**params)
+            print(f"ВОТ КОНЕЧНАЯ ССЫЛКА {route}")
+            return route
 
         except AttributeError as e:
-            raise ValueError(f"Unknown endpoint: {route_name} in service: {service}, {e}")
+            raise ValueError(
+                f"Unknown endpoint: {route_name} in service: {service}, {e}"
+            ) from e
         except KeyError as e:
-            raise ValueError(f"Unknown attribute or incorrect format: {e}")
+            raise ValueError(f"Unknown attribute or incorrect format: {e}") from e
 
-        print(f"КОНЕЧНАЯ ССЫЛКА:  {route.format(**params if params else {})}")  # debug print
         return route.format(**params if params else {})
 
 
@@ -157,13 +164,17 @@ class BaseRequestException(HTTPException):
     """
 
     def __init__(
-        self, message: Optional[str], status_code: Optional[int], response: Optional[Any] = None
+        self,
+        message: Optional[str],
+        status_code: Optional[int],
+        response: Optional[Any] = None,
     ):
         super().__init__(
             detail=(
                 message
                 if message
-                else f"Error occurred when trying make request: {response if response else 'None response'}"
+                else f"Error occurred when trying make request: {
+                    response if response else 'None response'}"
             ),
             status_code=status_code if status_code else status.HTTP_400_BAD_REQUEST,
         )
@@ -183,7 +194,9 @@ class SetRequest:
         self.timeout = timeout
 
     @staticmethod
-    async def validate_http_method(route_name: RoutesTypes, route_method: HttpMethods) -> None:
+    async def validate_http_method(
+        route_name: RoutesTypes, route_method: HttpMethods
+    ) -> None:
         """
         Validates if the given HTTP method is allowed for the specified route.
 
@@ -195,29 +208,33 @@ class SetRequest:
             ValueError: If the method does not match the expected value.
         """
         try:
-            route_name = (  # CREATE_USER
+            route_name_str = (  # CREATE_USER
                 route_name.name
                 if isinstance(route_name, UsersRoutes | AuthenticationRoutes)
                 else route_name
             )
 
-            expected_method = getattr(_HttpRoutesMethods, route_name).value
+            expected_method = getattr(_HttpRoutesMethods, route_name_str).value
             if expected_method != route_method.value:
                 raise ValueError(
-                    f"Invalid HTTP method {route_method.value} for route {route_name.value if isinstance(route_name, UsersRoutes| AuthenticationRoutes) else route_name}. "
+                    f"Invalid HTTP method {route_method.value} for route {
+                        route_name_str.value if isinstance(
+                            route_name_str, UsersRoutes | AuthenticationRoutes)
+                        else route_name_str}. "
                     f"Expected: {expected_method}"
                 )
-        except KeyError:
+        except KeyError as e:
             raise ValueError(
-                f"Route {route_name.value if isinstance(route_name, UsersRoutes| AuthenticationRoutes) else route_name} not found in _HttpRoutesMethods"
-            )
+                f"Route {route_name.value if isinstance(
+                    route_name, UsersRoutes | AuthenticationRoutes)
+                    else route_name} not found in _HttpRoutesMethods"
+            ) from e
 
     async def _get_url(
         self,
         service_name: ServiceName | str,
         route_name: RoutesTypes,
         params: dict[str, Any] | None,
-        route_method: HttpMethods,
     ) -> str:
         """
         Constructs full URL for the API request.
@@ -270,7 +287,9 @@ class SetRequest:
         if service_port:
             print(f"[DEBUG] Service port: {service_port}")  # Debug info
             final_url = (
-                f"{base_url}:{service_port}{route}" if service_port else f"{base_url}/{route}"
+                f"{base_url}:{service_port}{route}"
+                if service_port
+                else f"{base_url}/{route}"
             )
             print(f"[DEBUG] Constructed URL: {final_url}")  # Debug info
             return final_url
@@ -303,27 +322,25 @@ class SetRequest:
             BaseRequestException: For request timeouts or failures
         """
 
-        await self.validate_http_method(route_name=route_name, route_method=route_method)
+        await self.validate_http_method(
+            route_name=route_name, route_method=route_method
+        )
 
         url = await self._get_url(
             service_name=service_name,
             route_name=route_name,
             params=request_data.model_dump(exclude_none=True) if request_data else None,
-            route_method=route_method,
         )
 
         async with httpx.AsyncClient(timeout=self.timeout) as client:
             try:
-                print(
-                    f"ДЛЯ ОТКЛАДКИ: Method {route_method.value}, URL {url}, JSON {request_data if route_method.value == "POST" else None}"
-                )  # Debug info
-
                 response = await client.request(
                     method=route_method.value,
                     url=url,
                     json=(
                         request_data.model_dump(exclude_none=True)
-                        if route_method.value in ["POST", "PUT", "PATCH"] and request_data
+                        if route_method.value in ["POST", "PUT", "PATCH"]
+                        and request_data
                         else None
                     ),
                 )
@@ -331,26 +348,30 @@ class SetRequest:
                 result = response.json()
 
                 if "detail" in result and result["detail"]:
-                    return ErrorResponse(error=result["detail"], status_code=response.status_code)
+                    return ErrorResponse(
+                        error=result["detail"], status_code=response.status_code
+                    )
 
                 elif "detail" not in result:
                     return SuccessResponse(
                         detail=result, success=True, status_code=response.status_code
                     )
 
-            except httpx.TimeoutException:
+            except httpx.TimeoutException as e:
                 raise BaseRequestException(
-                    message="Request timed out", status_code=status.HTTP_504_GATEWAY_TIMEOUT
-                )
+                    message=f"Request timed out : {e}",
+                    status_code=status.HTTP_504_GATEWAY_TIMEOUT,
+                ) from e
 
             except httpx.RequestError as e:
                 raise BaseRequestException(
                     message=f"Request failed: {e}",
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                )
+                ) from e
 
             return ErrorResponse(
-                error="Unexpected error", status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+                error="Unexpected error",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
 
@@ -369,3 +390,10 @@ class GetUserRequest(BaseModel):
     id: Optional[int | str] = None
     login: Optional[str] = None
     name: Optional[str] = None
+
+
+class LoginModel(BaseModel):
+    """Login request model."""
+
+    login: str
+    password: str
