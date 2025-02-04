@@ -291,7 +291,7 @@ class SetRequest:
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
         )
 
-    async def send_request(  # noqa: R0913
+    async def send_request(  # noqa:
         self,
         service_name: ServiceName,
         route_name: RoutesTypes,
@@ -373,27 +373,3 @@ class SetRequest:
                 error="Unexpected error",
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
-
-
-class CreateUserRequest(BaseModel):
-    """Request model for user creation."""
-
-    login: str
-    name: str
-    password: str
-    email: str
-
-
-class GetUserRequest(BaseModel):
-    """Request model for user retrieval."""
-
-    id: Optional[int | str] = None
-    login: Optional[str] = None
-    name: Optional[str] = None
-
-
-class LoginModel(BaseModel):
-    """Login request model."""
-
-    login: str
-    password: str
