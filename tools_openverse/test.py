@@ -1,9 +1,9 @@
 import asyncio
 
+from tools_openverse.common.models import LoginOAuth2PasswordRequestForm
 from tools_openverse.common.request import (
     BaseRequestException,
     HttpMethods,
-    LoginModel,
     RoutesNamespace,
     ServiceName,
     SetRequest,
@@ -14,7 +14,7 @@ from tools_openverse.common.types import ErrorResponse
 async def main() -> None:
     request_client = SetRequest(timeout=5.0)
 
-    test_data = LoginModel(
+    test_data = LoginOAuth2PasswordRequestForm(
         login="testgtedgfdhgfGfdweDFGD",
         password="tesAt1@23",
     )
@@ -44,6 +44,7 @@ async def main() -> None:
             route_name=RoutesNamespace.USERS.LOG_IN,
             route_method=HttpMethods.POST,
             request_data=test_data,
+            form_data=True,
         )
 
         if isinstance(result, ErrorResponse):

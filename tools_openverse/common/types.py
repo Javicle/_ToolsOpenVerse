@@ -6,58 +6,79 @@ from pydantic import BaseModel, EmailStr, Field
 
 J = TypeVar("J", bound=BaseModel | dict[Any, Any] | str)
 
-Id: TypeAlias = Union[str, UUID]
-Login: TypeAlias = str
-Name: TypeAlias = str
-Password: TypeAlias = str
-Email: TypeAlias = Union[str, EmailStr]
-Is_active: TypeAlias = bool
-Created_at: TypeAlias = datetime
-Updated_at: TypeAlias = datetime
-AccessToken: TypeAlias = str
-RefreshTokenStr: TypeAlias = Optional[str]
-TokenType: TypeAlias = Optional[Literal["Bearer"]]
-Sub: TypeAlias = Union[Name, UUID]
-Scopes: TypeAlias = Optional[list[str]]
-Expires: TypeAlias = timedelta
-Expires_at: TypeAlias = datetime
-JwtAlgoritm: TypeAlias = str
-JwtSecretKey: TypeAlias = str
+# Basic types
+IdType: TypeAlias = Union[str, UUID]
+LoginType: TypeAlias = str
+NameType: TypeAlias = str
+PasswordType: TypeAlias = str
+EmailType: TypeAlias = Union[str, EmailStr]
+IsActiveType: TypeAlias = bool
+CreatedAtType: TypeAlias = datetime
+UpdatedAtType: TypeAlias = datetime
+AccessTokenType: TypeAlias = str
+RefreshTokenType: TypeAlias = Optional[str]
+TokenTypeType: TypeAlias = Optional[Literal["Bearer"]]
+SubType: TypeAlias = Union[NameType, UUID]
+ScopesType: TypeAlias = Optional[list[str]]
+ExpiresType: TypeAlias = timedelta
+ExpiresAtType: TypeAlias = datetime
+JwtAlgorithmType: TypeAlias = str
+JwtSecretKeyType: TypeAlias = str
 
 
-class UserTypes:
-    id = Id
-    login = Login
-    name = Name
-    password = Password
-    email = Email
-    is_active = Is_active
-    created_at = Created_at
-    updated_at = Updated_at
+class UserTypes(BaseModel):
+    """
+    Модель данных для пользователя.
+    """
+
+    id: IdType
+    login: LoginType
+    name: NameType
+    password: PasswordType
+    email: EmailType
+    is_active: IsActiveType
+    created_at: CreatedAtType
+    updated_at: UpdatedAtType
 
 
-class JwtTokenTypes:
-    access_token = AccessToken
-    refresh_token = RefreshTokenStr
-    token_type = TokenType
+class JwtTokenTypes(BaseModel):
+    """
+    Модель данных для JWT-токена.
+    """
+
+    access_token: AccessTokenType
+    refresh_token: RefreshTokenType
+    token_type: TokenTypeType
 
 
-class TokenPayloadTypes:
-    sub = Sub
-    scopes = Scopes
-    exp = Expires
+class TokenPayloadTypes(BaseModel):
+    """
+    Модель данных для полезной нагрузки токена.
+    """
+
+    sub: SubType
+    scopes: ScopesType
+    exp: ExpiresType
 
 
-class DecodedTokenTypes:
-    token = AccessToken
-    jwt_algoritm = JwtAlgoritm
-    jwt_secret_key = JwtSecretKey
+class DecodedTokenTypes(BaseModel):
+    """
+    Модель данных для декодированного токена.
+    """
+
+    token: AccessTokenType
+    jwt_algorithm: JwtAlgorithmType
+    jwt_secret_key: JwtSecretKeyType
 
 
-class RefreshTokenTypes:
-    user_id: Id
-    refresh_token: RefreshTokenStr
-    expires_at: Expires_at
+class RefreshTokenTypes(BaseModel):
+    """
+    Модель данных для обновления токена.
+    """
+
+    user_id: IdType
+    refresh_token: RefreshTokenType
+    expires_at: ExpiresAtType
 
 
 UsersRoutesTypes = Literal[
@@ -71,9 +92,7 @@ UsersRoutesTypes = Literal[
     "LOG_IN",
 ]
 
-AuthenticationRoutesTypes = Literal[
-    "GET_ACCESS_TOKEN", "GET_REFRESH_TOKEN", "GET_USER_INFO"
-]
+AuthenticationRoutesTypes = Literal["GET_ACCESS_TOKEN", "GET_REFRESH_TOKEN", "GET_USER_INFO"]
 
 RoutesNamespaceTypes = Union[UsersRoutesTypes, AuthenticationRoutesTypes]
 

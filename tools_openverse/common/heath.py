@@ -69,10 +69,8 @@ class HealthCheck:
                 status.last_check = end_time
                 status.response_time_ms = response_time
                 results[service.service_name] = status
-            except Exception as e:
-                self._logger.error(
-                    f"Error checking service {service.service_name}: {str(e)}"
-                )
+            except Exception as e:  # pylint: disable=broad-exception-caught
+                self._logger.error(f"Error checking service {service.service_name}: {str(e)}")
                 results[service.service_name] = ServiceStatusResponse(
                     service_name=service.service_name,
                     success=False,
@@ -80,9 +78,7 @@ class HealthCheck:
                     last_check=datetime.now(),
                 )
 
-        await asyncio.gather(
-            *[_check_service(service) for service in self._services.values()]
-        )
+        await asyncio.gather(*[_check_service(service) for service in self._services.values()])
         return results
 
     async def display_start_message(self) -> None:
@@ -105,8 +101,6 @@ class HealthCheck:
             )
 
             console.print("\n")
-            console.print(
-                Panel.fit("🚀 FastAPI Service Status Check", style="bold white")
-            )
+            console.print(Panel.fit("🚀 FastAPI Service Status Check", style="bold white"))
             console.print(table)
             console.print("\n")

@@ -7,7 +7,7 @@ from typing import Any, ClassVar, Optional
 from dotenv import find_dotenv, load_dotenv
 from pydantic import Field, field_validator, model_validator
 from pydantic_settings import BaseSettings
-from redis.asyncio import Redis, from_url
+from redis.asyncio import Redis, from_url  # pyright: ignore
 
 from tools_openverse.common.logger_ import setup_logger
 
@@ -78,7 +78,7 @@ class Settings(BaseSettings):
                 if self.DATABASE_FILE_NAME
                 else None
             )
-        elif self.DATABASE_DB == "postgresql":
+        if self.DATABASE_DB == "postgresql":
             url = (
                 f"{self.DATABASE_DRIVER}://"
                 f"{self.DATABASE_USER}:{self.DATABASE_PASSWORD}"
@@ -167,9 +167,9 @@ class Settings(BaseSettings):
 @cache
 def get_settings() -> Settings:
 
-    settings = Settings()
-    settings.log_settings(logger)
-    return settings
+    settings_ = Settings()
+    settings_.log_settings(logger)
+    return settings_
 
 
 # Экспортируем settings для использования в других модулях

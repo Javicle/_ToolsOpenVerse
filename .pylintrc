@@ -1,6 +1,8 @@
 [MASTER]
 ignore = venv,.venv,tests
 
+[DESIGN]
+max-positional-arguments=6
 
 [MESSAGES CONTROL]
 disable=
@@ -9,4 +11,5 @@ disable=
     C0116,  # Функция должна иметь докстринг
     too-few-public-methods,
     import-error,
-    W1203
+    W1203,
+    R0913

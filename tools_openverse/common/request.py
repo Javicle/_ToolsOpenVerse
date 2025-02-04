@@ -101,9 +101,7 @@ class RoutesNamespace:
 
         print("[DEBUG] Сработал метод get_route")  # Debug info
         service_value = (
-            service.value.upper()
-            if isinstance(service, ServiceName)
-            else service.upper()
+            service.value.upper() if isinstance(service, ServiceName) else service.upper()
         )
         route_service = getattr(cls, service_value, None)
 
@@ -127,9 +125,7 @@ class RoutesNamespace:
             return route
 
         except AttributeError as e:
-            raise ValueError(
-                f"Unknown endpoint: {route_name} in service: {service}, {e}"
-            ) from e
+            raise ValueError(f"Unknown endpoint: {route_name} in service: {service}, {e}") from e
         except KeyError as e:
             raise ValueError(f"Unknown attribute or incorrect format: {e}") from e
 
@@ -194,9 +190,7 @@ class SetRequest:
         self.timeout = timeout
 
     @staticmethod
-    async def validate_http_method(
-        route_name: RoutesTypes, route_method: HttpMethods
-    ) -> None:
+    async def validate_http_method(route_name: RoutesTypes, route_method: HttpMethods) -> None:
         """
         Validates if the given HTTP method is allowed for the specified route.
 
@@ -287,24 +281,23 @@ class SetRequest:
         if service_port:
             print(f"[DEBUG] Service port: {service_port}")  # Debug info
             final_url = (
-                f"{base_url}:{service_port}{route}"
-                if service_port
-                else f"{base_url}/{route}"
+                f"{base_url}:{service_port}{route}" if service_port else f"{base_url}/{route}"
             )
             print(f"[DEBUG] Constructed URL: {final_url}")  # Debug info
             return final_url
-        else:
-            raise BaseRequestException(
-                message=f"Service port not found for service {service_name}",
-                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            )
 
-    async def send_request(
+        raise BaseRequestException(
+            message=f"Service port not found for service {service_name}",
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+        )
+
+    async def send_request(  # noqa: R0913
         self,
         service_name: ServiceName,
         route_name: RoutesTypes,
         route_method: HttpMethods,
         request_data: Optional[BaseModel] = None,
+        form_data: bool = False,
     ) -> JSONResponseTypes:
         """
         Sends HTTP request to the specified service endpoint.
@@ -322,9 +315,7 @@ class SetRequest:
             BaseRequestException: For request timeouts or failures
         """
 
-        await self.validate_http_method(
-            route_name=route_name, route_method=route_method
-        )
+        await self.validate_http_method(route_name=route_name, route_method=route_method)
 
         url = await self._get_url(
             service_name=service_name,
@@ -341,6 +332,14 @@ class SetRequest:
                         request_data.model_dump(exclude_none=True)
                         if route_method.value in ["POST", "PUT", "PATCH"]
                         and request_data
+                        and not form_data
+                        else None
+                    ),
+                    data=(
+                        request_data.model_dump(exclude_none=True)
+                        if route_method.value in ["POST", "PUT", "PATCH"]
+                        and request_data
+                        and form_data
                         else None
                     ),
                 )
@@ -348,11 +347,12 @@ class SetRequest:
                 result = response.json()
 
                 if "detail" in result and result["detail"]:
-                    return ErrorResponse(
-                        error=result["detail"], status_code=response.status_code
-                    )
+                    print("-" * 100)
+                    print(f"Вот response.json : {result}")
+                    print("-" * 100)
+                    return ErrorResponse(error=result["detail"], status_code=response.status_code)
 
-                elif "detail" not in result:
+                if "detail" not in result:
                     return SuccessResponse(
                         detail=result, success=True, status_code=response.status_code
                     )
