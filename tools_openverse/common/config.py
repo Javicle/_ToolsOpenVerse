@@ -1,6 +1,5 @@
 import logging
 import os
-from functools import cache
 from pathlib import Path
 from typing import Any, ClassVar, Optional
 
@@ -164,7 +163,6 @@ class Settings(BaseSettings):
         return values
 
 
-@cache
 def get_settings() -> Settings:
 
     settings_ = Settings()
