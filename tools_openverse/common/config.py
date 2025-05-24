@@ -96,10 +96,13 @@ class Settings(BaseSettings):
         return f"redis://{auth_part}{self.REDIS_HOST}:{self.REDIS_PORT}"
 
     def log_settings(self, logger_: logging.Logger) -> None:
-        settings_dict = self.model_dump(exclude={"JWT_SECRET_KEY", "REDIS_PASSWORD"})
+        settings_dict = self.to_dict()
         logger_.info(f"Settings: {settings_dict}")
         for key, value in settings_dict.items():
             logger_.info(f"{key}: {value}")
+
+    def to_dict(self) -> dict[str, Any]:
+        return self.model_dump(exclude={"JWT_SECRET_KEY", "REDIS_PASSWORD"})
 
     @field_validator("PROJECT_NAME")
     @classmethod
