@@ -97,7 +97,6 @@ class Settings(BaseSettings):
 
     def log_settings(self, logger_: logging.Logger) -> None:
         settings_dict = self.to_dict()
-        logger_.info(f"Settings: {settings_dict}")
         for key, value in settings_dict.items():
             logger_.info(f"{key}: {value}")
 
