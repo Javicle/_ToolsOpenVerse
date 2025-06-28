@@ -92,7 +92,9 @@ UsersRoutesTypes = Literal[
     "LOG_IN",
 ]
 
-AuthenticationRoutesTypes = Literal["GET_ACCESS_TOKEN", "GET_REFRESH_TOKEN", "GET_USER_INFO"]
+AuthenticationRoutesTypes = Literal[
+    "GET_ACCESS_TOKEN", "GET_REFRESH_TOKEN", "GET_USER_INFO"
+]
 
 RoutesNamespaceTypes = Union[UsersRoutesTypes, AuthenticationRoutesTypes]
 

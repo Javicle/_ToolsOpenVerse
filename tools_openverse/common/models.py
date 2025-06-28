@@ -3,6 +3,9 @@ from typing import Optional, Self
 from fastapi import Form
 from pydantic import BaseModel
 
+_LOGIN_FORM = Form(...)
+_PASSWORD_FORM = Form(...)
+
 
 class CreateUserRequest(BaseModel):
     """Request model for user creation."""
@@ -37,7 +40,7 @@ class LoginOAuth2PasswordRequestForm(BaseModel):
     password: str
 
     @classmethod
-    def as_form(cls, login: str = Form(...), password: str = Form(...)) -> Self:  # noqa: B008
+    def as_form(cls, login: str = _LOGIN_FORM, password: str = _PASSWORD_FORM) -> Self:
         return cls(
             login=login,
             password=password,

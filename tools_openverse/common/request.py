@@ -1,6 +1,7 @@
 """
 API Client for managing user and authentication requests.
-Provides type-safe route management and request handling with automatic URL construction.
+Provides type-safe route management and request
+handling with automatic URL construction.
 """
 
 from enum import Enum
@@ -11,12 +12,15 @@ from fastapi import HTTPException, status
 from pydantic import BaseModel
 
 from .config import settings
+from .logger_ import setup_logger
 from .types import (
     ErrorResponse,
     JSONResponseTypes,
     RoutesNamespaceTypes,
     SuccessResponse,
 )
+
+logger = setup_logger()
 
 
 class UsersRoutes(str, Enum):
@@ -94,39 +98,55 @@ class RoutesNamespace:
 
         Returns:
             str: Formatted route string with parameters substituted
-
         Raises:
             ValueError: If service or route is not found
         """
+        logger.debug(
+            "Getting route for service=%s, route_name=%s, params=%s",
+            service,
+            route_name,
+            params,
+        )
 
-        print("[DEBUG] Сработал метод get_route")  # Debug info
         service_value = (
-            service.value.upper() if isinstance(service, ServiceName) else service.upper()
+            service.value.upper()
+            if isinstance(service, ServiceName)
+            else service.upper()
         )
         route_service = getattr(cls, service_value, None)
 
         if route_service is None:
+            logger.error("Unknown service: %s", service)
             raise ValueError(f"Unknown service: {service}")
 
         try:
             if isinstance(route_name, (UsersRoutes, AuthenticationRoutes)):
-
                 route = str(route_name.value)
-
             else:
                 route = str(route_service[route_name].value)
 
+            logger.debug("Base route template: %s", route)
+
             if "{" in route and "}" in route:
                 if not params:
+                    logger.error("Missing parameters for route template: %s", route)
                     raise ValueError("Missing parameters for route")
-                print(f"КОНЕЧНАЯ ССЫЛКА:  {route.format(**params)}")  # debug print
+
+                logger.debug("Formatting route with parameters: %s", params)
                 route = route.format(**params)
-            print(f"ВОТ КОНЕЧНАЯ ССЫЛКА {route}")
+
+            logger.info("Resolved route: %s", route)
             return route
 
         except AttributeError as e:
-            raise ValueError(f"Unknown endpoint: {route_name} in service: {service}, {e}") from e
+            logger.error(
+                "Unknown endpoint: %s in service: %s. Error: %s", route_name, service, e
+            )
+            raise ValueError(
+                f"Unknown endpoint: {route_name} in service: {service}, {e}"
+            ) from e
         except KeyError as e:
+            logger.error("Unknown attribute or incorrect format: %s", e)
             raise ValueError(f"Unknown attribute or incorrect format: {e}") from e
 
         return route.format(**params if params else {})
@@ -165,13 +185,22 @@ class BaseRequestException(HTTPException):
         status_code: Optional[int],
         response: Optional[Any] = None,
     ):
+        error_detail = (
+            message
+            if message
+            else f"Error occurred when trying make request: {
+                response if response else 'None response'}"
+        )
+
+        logger.error(
+            "BaseRequestException raised: status_code=%s, message=%s, response=%s",
+            status_code,
+            message,
+            response,
+        )
+
         super().__init__(
-            detail=(
-                message
-                if message
-                else f"Error occurred when trying make request: {
-                    response if response else 'None response'}"
-            ),
+            detail=error_detail,
             status_code=status_code if status_code else status.HTTP_400_BAD_REQUEST,
         )
 
@@ -188,9 +217,12 @@ class SetRequest:
 
     def __init__(self, timeout: float = 10.0) -> None:
         self.timeout = timeout
+        logger.info("SetRequest initialized with timeout: %s seconds", timeout)
 
     @staticmethod
-    async def validate_http_method(route_name: RoutesTypes, route_method: HttpMethods) -> None:
+    async def validate_http_method(
+        route_name: RoutesTypes, route_method: HttpMethods
+    ) -> None:
         """
         Validates if the given HTTP method is allowed for the specified route.
 
@@ -201,6 +233,8 @@ class SetRequest:
         Raises:
             ValueError: If the method does not match the expected value.
         """
+        logger.debug("Validating HTTP method %s for route %s", route_method, route_name)
+
         try:
             route_name_str = (  # CREATE_USER
                 route_name.name
@@ -210,6 +244,12 @@ class SetRequest:
 
             expected_method = getattr(_HttpRoutesMethods, route_name_str).value
             if expected_method != route_method.value:
+                logger.error(
+                    "HTTP method validation failed: got %s, expected %s for route %s",
+                    route_method.value,
+                    expected_method,
+                    route_name_str,
+                )
                 raise ValueError(
                     f"Invalid HTTP method {route_method.value} for route {
                         route_name_str.value if isinstance(
@@ -217,12 +257,16 @@ class SetRequest:
                         else route_name_str}. "
                     f"Expected: {expected_method}"
                 )
-        except KeyError as e:
+
+            logger.debug("HTTP method validation passed")
+
+        except KeyError as exc:
+            logger.error("Route not found in _HttpRoutesMethods: %s", route_name)
             raise ValueError(
                 f"Route {route_name.value if isinstance(
                     route_name, UsersRoutes | AuthenticationRoutes)
                     else route_name} not found in _HttpRoutesMethods"
-            ) from e
+            ) from exc
 
     async def _get_url(
         self,
@@ -244,6 +288,13 @@ class SetRequest:
         Raises:
             BaseRequestException: If service or route is invalid
         """
+        logger.debug(
+            "Constructing URL for service=%s, route=%s, params=%s",
+            service_name,
+            route_name,
+            params,
+        )
+
         route = None
 
         service_name = (
@@ -265,6 +316,7 @@ class SetRequest:
             route = route_name.lstrip("/")
 
         if not service_name and not route_name:
+            logger.error("Route %s for service %s not found", route_name, service_name)
             raise BaseRequestException(
                 message=f"Route {route_name} for service {service_name} not found",
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -276,16 +328,28 @@ class SetRequest:
 
         base_url = base_url.rstrip("/")
 
-        service_port: str | int = getattr(ServicesPorts, service_name).value
+        try:
+            service_port: str | int = getattr(ServicesPorts, service_name).value
+            logger.debug(
+                "Found service port: %s for service: %s", service_port, service_name
+            )
+        except AttributeError as exc:
+            logger.error("Service port not found for service: %s", service_name)
+            raise BaseRequestException(
+                message=f"Service port not found for service {service_name}",
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            ) from exc
 
         if service_port:
-            print(f"[DEBUG] Service port: {service_port}")  # Debug info
             final_url = (
-                f"{base_url}:{service_port}{route}" if service_port else f"{base_url}/{route}"
+                f"{base_url}:{service_port}{route}"
+                if service_port
+                else f"{base_url}/{route}"
             )
-            print(f"[DEBUG] Constructed URL: {final_url}")  # Debug info
+            logger.info("Constructed final URL: %s", final_url)
             return final_url
 
+        logger.error("Service port is empty for service: %s", service_name)
         raise BaseRequestException(
             message=f"Service port not found for service {service_name}",
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
@@ -306,7 +370,8 @@ class SetRequest:
             service_name: Service identifier use ServiceName
             route_name: Route identifier use UsersRoutes | AuthenticationRoutes
             route_method: HTTP method to use, use HttpMethods
-            data: Optional request body data
+            request_data: Optional request body data
+            form_data: Whether to send data as form data
 
         Returns:
             Any: JSON response from the API
@@ -314,8 +379,20 @@ class SetRequest:
         Raises:
             BaseRequestException: For request timeouts or failures
         """
+        logger.info(
+            "Sending %s request to service=%s, route=%s, form_data=%s",
+            route_method.value,
+            service_name.value,
+            route_name,
+            form_data,
+        )
 
-        await self.validate_http_method(route_name=route_name, route_method=route_method)
+        if request_data:
+            logger.debug("Request data provided: %s", type(request_data).__name__)
+
+        await self.validate_http_method(
+            route_name=route_name, route_method=route_method
+        )
 
         url = await self._get_url(
             service_name=service_name,
@@ -325,6 +402,8 @@ class SetRequest:
 
         async with httpx.AsyncClient(timeout=self.timeout) as client:
             try:
+                logger.debug("Making HTTP request to: %s", url)
+
                 response = await client.request(
                     method=route_method.value,
                     url=url,
@@ -344,31 +423,51 @@ class SetRequest:
                     ),
                 )
 
-                result = response.json()
+                logger.info(
+                    "Received response with status code: %s", response.status_code
+                )
+
+                try:
+                    result = response.json()
+                    logger.debug("Response JSON parsed successfully")
+                except Exception as e:
+                    logger.error("Failed to parse response JSON: %s", e)
+                    raise BaseRequestException(
+                        message=f"Failed to parse response JSON: {e}",
+                        status_code=response.status_code,
+                    ) from e
 
                 if "detail" in result and result["detail"]:
-                    print("-" * 100)
-                    print(f"Вот response.json : {result}")
-                    print("-" * 100)
-                    return ErrorResponse(error=result["detail"], status_code=response.status_code)
+                    logger.warning(
+                        "API returned error response: status_code=%s, detail=%s",
+                        response.status_code,
+                        result["detail"],
+                    )
+                    return ErrorResponse(
+                        error=result["detail"], status_code=response.status_code
+                    )
 
                 if "detail" not in result:
+                    logger.info("Request completed successfully")
                     return SuccessResponse(
                         detail=result, success=True, status_code=response.status_code
                     )
 
             except httpx.TimeoutException as e:
+                logger.error("Request timed out after %s seconds: %s", self.timeout, e)
                 raise BaseRequestException(
                     message=f"Request timed out : {e}",
                     status_code=status.HTTP_504_GATEWAY_TIMEOUT,
                 ) from e
 
             except httpx.RequestError as e:
+                logger.error("Request failed: %s", e)
                 raise BaseRequestException(
                     message=f"Request failed: {e}",
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 ) from e
 
+            logger.error("Unexpected error occurred during request processing")
             return ErrorResponse(
                 error="Unexpected error",
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
