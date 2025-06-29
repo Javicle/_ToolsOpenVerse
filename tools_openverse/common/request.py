@@ -189,7 +189,8 @@ class BaseRequestException(HTTPException):
             message
             if message
             else f"Error occurred when trying make request: {
-                response if response else 'None response'}"
+                response if response else 'None response'
+            }"
         )
 
         logger.error(
@@ -252,9 +253,12 @@ class SetRequest:
                 )
                 raise ValueError(
                     f"Invalid HTTP method {route_method.value} for route {
-                        route_name_str.value if isinstance(
-                            route_name_str, UsersRoutes | AuthenticationRoutes)
-                        else route_name_str}. "
+                        route_name_str.value
+                        if isinstance(
+                            route_name_str, UsersRoutes | AuthenticationRoutes
+                        )
+                        else route_name_str
+                    }. "
                     f"Expected: {expected_method}"
                 )
 
@@ -263,9 +267,11 @@ class SetRequest:
         except KeyError as exc:
             logger.error("Route not found in _HttpRoutesMethods: %s", route_name)
             raise ValueError(
-                f"Route {route_name.value if isinstance(
-                    route_name, UsersRoutes | AuthenticationRoutes)
-                    else route_name} not found in _HttpRoutesMethods"
+                f"Route {
+                    route_name.value
+                    if isinstance(route_name, UsersRoutes | AuthenticationRoutes)
+                    else route_name
+                } not found in _HttpRoutesMethods"
             ) from exc
 
     async def _get_url(

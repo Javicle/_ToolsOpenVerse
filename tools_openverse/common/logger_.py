@@ -1,3 +1,9 @@
+"""
+This module provides a logger setup utility for the OpenVerse tools package.
+It configures a logger with both file and console handlers, using a rotating file
+handler for persistent logging and a stream handler for console output.
+"""
+
 import logging
 import sys
 from logging.handlers import RotatingFileHandler
@@ -5,6 +11,18 @@ from pathlib import Path
 
 
 def setup_logger(name: str = __name__) -> logging.Logger:
+    """
+    Set up and return a configured logger instance.
+
+    The logger writes DEBUG and higher level logs to a rotating file in the 'logs'
+    directory, and INFO and higher level logs to the console (stdout).
+
+    Args:
+        name (str): The name of the logger. Defaults to the module's __name__.
+
+    Returns:
+        logging.Logger: Configured logger instance.
+    """
     log_dir = Path("logs")
     log_dir.mkdir(exist_ok=True)
 
