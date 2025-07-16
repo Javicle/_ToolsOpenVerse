@@ -32,6 +32,9 @@ ExpiresAtType: TypeAlias = datetime  # Expiration timestamp
 JwtAlgorithmType: TypeAlias = str  # JWT algorithm name
 JwtSecretKeyType: TypeAlias = str  # JWT secret key string
 
+# Sentinal type for using instead of None
+Sentinal: Any = object
+
 
 class UserTypes(BaseModel):
     """

@@ -278,7 +278,7 @@ class SetRequest:
         self,
         service_name: ServiceName | str,
         route_name: RoutesTypes,
-        params: dict[str, Any] | None,
+        params: Optional[dict[str, Any]] = None,  # noqa: ANN401
     ) -> str:
         """
         Constructs full URL for the API request.
