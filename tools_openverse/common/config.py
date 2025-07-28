@@ -298,9 +298,9 @@ def get_settings() -> Settings:
 settings = get_settings()
 
 
-async def get_redis() -> Redis:
+def get_redis() -> Redis:
     """
-    Create and return async Redis connection.
+    Create and return Redis connection.
 
     Creates an asynchronous Redis connection using the configuration
     settings. The connection is configured with UTF-8 encoding and
@@ -314,6 +314,6 @@ async def get_redis() -> Redis:
         >>> await redis_client.set("key", "value")
         >>> value = await redis_client.get("key")
     """
-    return await from_url(  # type: ignore
+    return from_url(  # type: ignore
         settings.redis_url, decode_responses=True, encoding="utf-8"
     )
