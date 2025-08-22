@@ -19,4 +19,11 @@ setup(
         "rich",
         "sqlalchemy",
     ],
+    extras_require={
+        "tests": [
+            "pytest",
+            "pytest-asyncio",
+            "httpx",
+        ]
+    },
 )

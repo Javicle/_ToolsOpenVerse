@@ -12,7 +12,7 @@ name = "tools-openverse"
 version = "0.1.0"
 description = ""
 authors = ["Javicle <supergamer.08.2006@gmail.com>"]
-
+python = ">=3.12,<4.0"
 
 packages = [
     { include = "tools_openverse" }
@@ -37,6 +37,10 @@ sqlalchemy = "^2.0.37"
 flake8-bugbear = "^24.12.12"
 flake8-bandit = "^4.1.1"
 pre-commit = "^4.1.0"
+
+[tool.poetry.group.tests.dependencies]
+pytest = "^8.0"
+pytest-asyncio = "^0.23"
 
 [build-system]
 requires = ["poetry-core"]

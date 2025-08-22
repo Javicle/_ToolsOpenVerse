@@ -2,10 +2,13 @@ from tools_openverse.common.config import get_redis, settings
 from tools_openverse.common.logger_ import setup_logger
 from tools_openverse.common.request import (
     AuthenticationRoutes,
+    BaseRequestException,
+    HttpMethods,
     ServiceName,
     SetRequest,
     UsersRoutes,
 )
+from tools_openverse.common.types import ErrorResponse, SuccessResponse
 
 __all__ = [
     "SetRequest",
@@ -15,4 +18,8 @@ __all__ = [
     "ServiceName",
     "UsersRoutes",
     "AuthenticationRoutes",
+    "HttpMethods",
+    "SuccessResponse",
+    "ErrorResponse",
+    "BaseRequestException",
 ]
