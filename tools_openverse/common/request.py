@@ -275,7 +275,7 @@ class SetRequest:
             logger.error("Failed to get route: %s", exc)
             raise BaseRequestException(
                 message=(
-                f"Failed to get route for service {service_name}, route {route_name}"
+                    f"Failed to get route for service {service_name}, route {route_name}"
                 ),
                 status_code=status.HTTP_404_NOT_FOUND,
             ) from exc
