@@ -12,7 +12,6 @@ name = "tools-openverse"
 version = "0.1.0"
 description = ""
 authors = ["Javicle <supergamer.08.2006@gmail.com>"]
-python = ">=3.12,<4.0"
 
 packages = [
     { include = "tools_openverse" }
