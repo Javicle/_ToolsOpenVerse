@@ -38,18 +38,9 @@ tools_openverse/
 		dep.py           # Зависимости
 		types.py         # Типы ответов
 		...
-	tests/
-		test_set_request.py
 ```
 
 ---
-
-## 🧪 Тестирование
-
-```bash
-poetry run pytest
-```
-
 
 ## 📄 Лицензия
 MIT License © Javicle

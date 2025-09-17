@@ -8,7 +8,9 @@ from tools_openverse.common.request import (
     SetRequest,
     UsersRoutes,
 )
-from tools_openverse.common.types import ErrorResponse, SuccessResponse
+from tools_openverse.common.types import AccessTokenType, ErrorResponse, RefreshTokenType, SuccessResponse
+from tools_openverse.common.abc.user import AbstractUser
+
 
 __all__ = [
     "SetRequest",
@@ -22,4 +24,7 @@ __all__ = [
     "SuccessResponse",
     "ErrorResponse",
     "BaseRequestException",
+    "AbstractUser",
+    "AccessTokenType",
+    "RefreshTokenType"
 ]
